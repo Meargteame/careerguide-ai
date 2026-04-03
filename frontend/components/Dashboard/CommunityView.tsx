@@ -45,51 +45,83 @@ const CommunityView: React.FC = () => {
       </header>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-          <div className="pointer-events-auto bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
-            <div className="p-10">
-              <div className="flex justify-between items-center mb-8 pb-6 border-b-2 border-slate-100 dark:border-slate-800">
-                <div>
-                  <p className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-1">New Message</p>
-                  <h3 className="text-3xl font-display font-black text-slate-800 dark:text-white uppercase tracking-wider">Post to Board</h3>
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 pointer-events-none">
+          <div className="pointer-events-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl w-full rounded-[2rem] border border-slate-200/80 dark:border-slate-700/80 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.25)] dark:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)] animate-in slide-in-from-top-4 zoom-in-95 duration-300 overflow-hidden">
+            
+            {/* Accent top bar */}
+            <div className="h-1 w-full bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400" />
+
+            <div className="p-8">
+              {/* Header */}
+              <div className="flex justify-between items-start mb-7">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-inner">
+                    <Send size={20} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-0.5">Community Board</p>
+                    <h3 className="text-xl font-display font-black text-slate-800 dark:text-white tracking-tight">New Post</h3>
+                  </div>
                 </div>
-                <button onClick={() => setIsModalOpen(false)} className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:-rotate-12 transition-all">
-                  <X size={24} strokeWidth={2.5} />
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:rotate-90 transition-all duration-200"
+                >
+                  <X size={18} strokeWidth={2.5} />
                 </button>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
+                {/* Category pills */}
                 <div>
-                  <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Category</label>
-                  <select
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-500 focus:bg-white shadow-sm transition-all appearance-none cursor-pointer"
-                  >
-                    <option>Academics</option>
-                    <option>Collaboration</option>
-                    <option>DevOps</option>
-                    <option>Career</option>
-                    <option>General</option>
-                  </select>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Category</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['Academics', 'Collaboration', 'DevOps', 'Career', 'General'].map(tag => (
+                      <button
+                        key={tag}
+                        onClick={() => setNewTag(tag)}
+                        className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all border-2 ${
+                          newTag === tag
+                            ? 'bg-emerald-500 text-white border-emerald-600 shadow-[0_4px_0_rgba(16,185,129,0.4)] -translate-y-0.5'
+                            : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-emerald-300 hover:text-emerald-600'
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div>
-                  <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Your Message</label>
+                {/* Message input */}
+                <div className="relative">
                   <textarea
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     placeholder="What knowledge do you seek?"
-                    className="w-full h-40 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl p-5 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-500 focus:bg-white shadow-sm resize-none transition-all placeholder:text-slate-400"
+                    rows={4}
+                    className="w-full bg-slate-50 dark:bg-slate-800/80 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 font-medium text-slate-700 dark:text-white outline-none focus:border-emerald-400 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 resize-none transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600 text-sm leading-relaxed"
                   />
+                  <span className="absolute bottom-3 right-4 text-[10px] font-bold text-slate-300 dark:text-slate-600">
+                    {newTitle.length} chars
+                  </span>
                 </div>
 
-                <button
-                  onClick={handlePost}
-                  className="w-full px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[13px] transition-all bg-emerald-500 text-white shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none flex items-center justify-center gap-2 mt-4"
-                >
-                  <Send size={18} strokeWidth={3} className="mr-1" /> Post Message
-                </button>
+                {/* Actions */}
+                <div className="flex gap-3 pt-1">
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="flex-1 py-3.5 rounded-xl font-black uppercase tracking-widest text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border-2 border-transparent"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handlePost}
+                    disabled={!newTitle.trim()}
+                    className="flex-[2] py-3.5 rounded-xl font-black uppercase tracking-widest text-[11px] bg-emerald-500 text-white shadow-[0_4px_0_rgba(16,185,129,0.6)] hover:translate-y-[2px] hover:shadow-[0_2px_0_rgba(16,185,129,0.6)] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:transform-none disabled:shadow-[0_4px_0_rgba(16,185,129,0.6)]"
+                  >
+                    <Send size={14} strokeWidth={3} /> Post to Board
+                  </button>
+                </div>
               </div>
             </div>
           </div>
