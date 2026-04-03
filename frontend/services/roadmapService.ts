@@ -26,7 +26,6 @@ export const saveRoadmap = async (roadmap: DetailedRoadmap, userId: string): Pro
 
     if (error) {
       console.error('Error saving roadmap:', error);
-      alert('Database Error saving roadmap: ' + error.message);
       return null;
     }
 

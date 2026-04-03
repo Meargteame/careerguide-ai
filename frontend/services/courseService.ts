@@ -41,7 +41,6 @@ export const createCourseFromRoadmap = async (role: string, userId: string): Pro
 
     if (error) {
       console.error('Supabase save error:', error);
-      alert('Database Error saving course: ' + error.message);
       return null;
     }
     
