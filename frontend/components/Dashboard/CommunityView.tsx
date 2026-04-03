@@ -45,8 +45,9 @@ const CommunityView: React.FC = () => {
       </header>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-lg p-10 rounded-[2.5rem] border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+          <div className="pointer-events-auto bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+            <div className="p-10">
             <div className="flex justify-between items-center mb-8 pb-6 border-b-2 border-slate-100 dark:border-slate-800">
               <div>
                 <p className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-1">New Message</p>
@@ -91,6 +92,7 @@ const CommunityView: React.FC = () => {
               </button>
             </div>
           </div>
+        </div>
         </div>
       )}
 
