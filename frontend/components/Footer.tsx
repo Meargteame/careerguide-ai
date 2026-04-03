@@ -54,7 +54,7 @@ const Footer: React.FC = () => {
         </div>
         
         <div className="border-t-2 border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="font-bold text-slate-400">© {new Date().getFullYear()} CareerGuide. All rights reserved.</p>
+          <p className="font-bold text-slate-400">© {new Date().getFullYear()} Meridian. All rights reserved.</p>
           <div className="flex items-center gap-2 font-bold bg-white border-2 border-slate-200 px-5 py-3 rounded-full shadow-sm text-slate-500">
             Built with <Heart className="text-rose-500 mx-1 fill-rose-500" size={18} /> for future devs
           </div>

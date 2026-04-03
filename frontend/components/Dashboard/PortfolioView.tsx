@@ -15,7 +15,8 @@ import {
   Clock,
   Zap,
   Flame,
-  LineChart
+  LineChart,
+  Scroll
 } from 'lucide-react';
 import { User } from '../../types';
 import { getStudentStats } from '../../services/courseService';
@@ -38,85 +39,100 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({ user }) => {
   const userRole = user?.role === "student" ? "Student" : "Admin";
 
   return (
-    <div className="animate-reveal space-y-10">
-      <header>
-        <h1 className="text-3xl font-display font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest leading-none">My Profile</h1>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">See your stats and badges</p>
+    <div className="animate-reveal space-y-12 pb-20">
+      <header className="pb-10 border-b-4 border-slate-100 dark:border-slate-800 mb-12">
+        <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">Identity</p>
+        <h1 className="text-4xl md:text-5xl font-display font-black text-slate-800 dark:text-white uppercase tracking-widest leading-none drop-shadow-sm">My Profile</h1>
       </header>
       
       {/* Profile Header/Banner */}
-      <div className="relative rounded-[3rem] overflow-hidden dashboard-card shadow-sm">
-        <div className="h-64 bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10 flex justify-around p-10 pointer-events-none">
-             <Flame size={120} className="text-secondary rotate-12" />
-             <Trophy size={160} className="text-secondary -rotate-12" />
+      <div className="relative rounded-[3rem] overflow-hidden bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 shadow-none">
+        <div className="h-64 bg-emerald-500 dark:bg-emerald-600 relative overflow-hidden border-b-4 border-emerald-600 dark:border-emerald-700">
+          <div className="absolute inset-0 opacity-20 flex justify-around p-10 pointer-events-none">
+             <Flame size={140} strokeWidth={2} className="text-white rotate-12 drop-shadow-md" />
+             <Trophy size={180} strokeWidth={2} className="text-white -rotate-12 drop-shadow-md" />
           </div>
+          {/* Banner abstract shapes */}
+          <div className="absolute top-[-20%] left-[-10%] w-64 h-64 bg-white/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-[-20%] right-[10%] w-80 h-80 bg-white/20 rounded-full blur-3xl"></div>
         </div>
-        <div className="px-12 pb-12">
-          <div className="flex flex-col md:flex-row items-end gap-10 -mt-20 relative z-10">
-            <div className="relative group">
-               <div className="w-48 h-48 rounded-[2.5rem] bg-[#FDE68A] border-[8px] border-white dark:border-slate-900 flex items-center justify-center overflow-hidden shadow-xl">
-                 <img src={`https://api.dicebear.com/7.x/notionists/svg?seed=${userName}`} alt="Avatar" className="w-full h-full object-cover" />
+        
+        <div className="px-8 md:px-12 pb-12">
+          <div className="flex flex-col md:flex-row items-center md:items-end gap-8 -mt-24 relative z-10 text-center md:text-left">
+            <div className="relative group shrink-0">
+               <div className="w-48 h-48 rounded-[2.5rem] bg-indigo-100 border-[8px] border-white dark:border-slate-900 flex items-center justify-center overflow-hidden shadow-[0_8px_0_rgba(203,213,225,1)] dark:shadow-[0_8px_0_rgba(15,23,42,1)] group-hover:-translate-y-2 transition-transform">
+                 <img src={`https://api.dicebear.com/7.x/notionists/svg?seed=${userName}`} alt="Avatar" className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-500" />
                </div>
-               <button className="absolute -right-2 bottom-4 w-10 h-10 bg-secondary text-white rounded-2xl flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-                 <Edit2 size={16} />
+               <button className="absolute -right-2 bottom-4 w-12 h-12 bg-blue-500 text-white rounded-[1rem] flex items-center justify-center shadow-[0_4px_0_rgba(37,99,235,1)] hover:bg-blue-600 hover:-translate-y-1 hover:shadow-[0_6px_0_rgba(37,99,235,1)] active:translate-y-[4px] active:shadow-none transition-all border-2 border-blue-400">
+                 <Edit2 size={20} strokeWidth={3} />
                </button>
             </div>
             
-            <div className="flex-1 mb-4">
-              <div className="inline-flex items-center gap-2 text-slate-300 font-bold text-xs uppercase tracking-widest mb-3">
+            <div className="flex-1 mb-2">
+              <div className="inline-flex items-center gap-2 text-slate-500 font-black text-[11px] uppercase tracking-[0.2em] mb-3 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-sm">
                 @{user?.email ? user.email.split('@')[0].toUpperCase() : 'USER'}-ID
               </div>
-              <h2 className="text-6xl font-display font-bold text-primary dark:text-white mb-4">{userName}</h2>
-              <div className="flex flex-wrap items-center gap-6">
-                <span className="flex items-center gap-2 text-slate-500 font-bold text-sm">
-                  <Zap size={18} className="text-accent fill-accent" /> {stats.totalXP} Total XP
+              <h2 className="text-4xl md:text-6xl font-display font-black text-slate-800 dark:text-white mb-6 drop-shadow-sm">{userName}</h2>
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                <span className="flex items-center gap-2 text-amber-600 bg-amber-50 border-2 border-amber-200 font-black text-sm px-4 py-2 rounded-xl shadow-sm">
+                  <Zap size={18} strokeWidth={3} className="text-amber-500 fill-amber-500" /> {stats.totalXP} Total XP
                 </span>
-                <span className="flex items-center gap-2 text-slate-500 font-bold text-sm">
-                  <Flame size={18} className="text-secondary fill-secondary" /> {stats.coursesEnrolled} Courses
+                <span className="flex items-center gap-2 text-rose-600 bg-rose-50 border-2 border-rose-200 font-black text-sm px-4 py-2 rounded-xl shadow-sm">
+                  <Flame size={18} strokeWidth={3} className="text-rose-500 fill-rose-500" /> {stats.coursesEnrolled} Quests
                 </span>
               </div>
             </div>
             
-            <div className="flex gap-4 mb-4">
-               <button className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-secondary transition-all">
-                 <Share2 size={16} /> Share
+            <div className="flex flex-col sm:flex-row gap-4 mb-2 mt-6 md:mt-0 w-full md:w-auto">
+               <button className="flex-1 md:flex-none flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest text-slate-600 hover:bg-white dark:hover:bg-slate-700 transition-all border-2 border-slate-200 dark:border-slate-700 shadow-sm active:translate-y-[2px] active:shadow-none hover:-translate-y-1">
+                 <Share2 size={18} strokeWidth={3} /> Share Link
                </button>
-               <button className="flex items-center gap-3 bg-secondary text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-secondary/20">
-                 <Edit2 size={16} /> Edit Profile
+               <button className="flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all bg-emerald-500 text-white shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none">
+                 <Edit2 size={18} strokeWidth={3} /> Edit Profile
                </button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-10">
-        <div className="lg:col-span-1 space-y-10">
-          <div className="dashboard-card p-10 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-            <h3 className="text-slate-300 font-black uppercase tracking-[0.3em] text-[10px] mb-8">Profile Bio</h3>
-            <p className="text-primary dark:text-slate-300 text-lg font-medium leading-relaxed italic border-l-4 border-secondary/20 pl-6 mb-10">
-              "This user is still crafting their story. Stay tuned for more updates about their journey on CareerGuide."
+      <div className="grid lg:grid-cols-3 gap-12">
+        <div className="lg:col-span-1 space-y-12">
+          <div className="bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 p-10 rounded-[3rem] hover:-translate-y-2 hover:shadow-[0_12px_0_rgba(226,232,240,1)] transition-all">
+            <h3 className="text-slate-500 font-black uppercase tracking-[0.3em] text-[11px] mb-8 flex items-center gap-3">
+              <Scroll size={18} className="text-slate-400" /> Lore
+            </h3>
+            <p className="text-slate-700 dark:text-slate-300 text-lg font-bold leading-relaxed italic border-l-4 border-blue-500 pl-6 mb-10 bg-blue-50 dark:bg-blue-900/10 py-4 rounded-r-2xl">
+              "This hero is currently out on an adventure crafting their origin story."
             </p>
-            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-widest text-slate-300">
-               <Clock size={14} /> Member since February 2026
+            <div className="flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border-2 border-slate-100 dark:border-slate-700 inline-flex">
+               <Clock size={16} strokeWidth={3} className="text-slate-400" /> Member since Feb '26
             </div>
           </div>
         </div>
 
         <div className="lg:col-span-2 grid md:grid-cols-2 gap-8">
-           <div className="dashboard-card bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 flex flex-col justify-center">
-              <div className="flex items-center gap-4 text-secondary mb-4">
-                 <Award size={24} />
-                 <span className="text-xs font-black uppercase tracking-widest">League</span>
+           <div className="bg-amber-400 border-4 border-amber-500 dark:border-amber-600 p-10 rounded-[3rem] shadow-[0_8px_0_rgba(217,119,6,1)] hover:-translate-y-2 hover:shadow-[0_12px_0_rgba(217,119,6,1)] transition-all flex flex-col justify-center relative overflow-hidden group">
+              <div className="absolute top-[-30%] right-[-20%] w-48 h-48 bg-white/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
+              
+              <div className="flex items-center gap-4 text-amber-900 mb-6 relative z-10">
+                 <div className="w-16 h-16 bg-white/40 rounded-[1.5rem] flex items-center justify-center border-2 border-white/50 shadow-inner group-hover:rotate-12 transition-transform">
+                   <Award size={32} strokeWidth={2.5} className="text-amber-800" />
+                 </div>
+                 <span className="text-[13px] font-black uppercase tracking-widest bg-amber-500 text-amber-900 px-4 py-2 rounded-xl shadow-inner border border-amber-600">Guild Rank</span>
               </div>
-              <h3 className="text-4xl font-display font-bold text-primary dark:text-white uppercase tracking-widest">Bronze</h3>
+              <h3 className="text-5xl font-display font-black text-slate-900 uppercase tracking-widest drop-shadow-sm relative z-10">Bronze</h3>
            </div>
-           <div className="dashboard-card bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 flex flex-col justify-center">
-              <div className="flex items-center gap-4 text-accent mb-4">
-                 <Flame size={24} />
-                 <span className="text-xs font-black uppercase tracking-widest">Streak</span>
+           
+           <div className="bg-rose-500 border-4 border-rose-600 dark:border-rose-700 p-10 rounded-[3rem] shadow-[0_8px_0_rgba(225,29,72,1)] hover:-translate-y-2 hover:shadow-[0_12px_0_rgba(225,29,72,1)] transition-all flex flex-col justify-center relative overflow-hidden group">
+              <div className="absolute top-[-30%] right-[-20%] w-48 h-48 bg-white/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
+              
+              <div className="flex items-center gap-4 text-white mb-6 relative z-10">
+                 <div className="w-16 h-16 bg-white/20 rounded-[1.5rem] flex items-center justify-center border-2 border-white/30 shadow-inner group-hover:-rotate-12 transition-transform">
+                   <Flame size={32} strokeWidth={2.5} className="text-white fill-white" />
+                 </div>
+                 <span className="text-[13px] font-black uppercase tracking-widest bg-rose-600 text-white px-4 py-2 rounded-xl shadow-inner border border-rose-700">Days Active</span>
               </div>
-              <h3 className="text-4xl font-display font-bold text-primary dark:text-white">1</h3>
+              <h3 className="text-6xl font-display font-black text-white relative z-10 drop-shadow-md">1</h3>
            </div>
         </div>
       </div>

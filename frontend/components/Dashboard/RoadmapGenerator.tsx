@@ -106,10 +106,10 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
 
   const getResourceIcon = (type: string) => {
     switch(type) {
-      case 'video': return <Youtube size={16} className="text-red-500" />;
-      case 'course': return <BookOpen size={16} className="text-indigo-500" />;
-      case 'documentation': return <FileText size={16} className="text-slate-500" />;
-      default: return <Globe size={16} className="text-emerald-500" />;
+      case 'video': return <Youtube size={16} className="text-red-500 hover:-rotate-12 transition-transform" />;
+      case 'course': return <BookOpen size={16} className="text-amber-500 hover:scale-110 transition-transform" />;
+      case 'documentation': return <FileText size={16} className="text-slate-500 hover:scale-110 transition-transform" />;
+      default: return <Globe size={16} className="text-emerald-500 shadow-sm" />;
     }
   };
 
@@ -129,16 +129,16 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
           </p>
         </div>
         <div className="flex gap-4">
-           <button className="glass dark:bg-slate-900/50 px-6 py-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center gap-3 hover:bg-white transition-all text-xs font-black uppercase tracking-widest text-slate-600">
-             <Share2 size={16} /> Share
+           <button className="bg-white border-2 border-slate-200 dark:border-slate-800 px-6 py-4 rounded-2xl flex items-center gap-3 hover:translate-y-[2px] transition-all text-xs font-black uppercase tracking-widest text-slate-600 shadow-[0_6px_0_rgba(226,232,240,1)] active:shadow-none active:translate-y-[6px]">
+             <Share2 size={18} /> Share Log
            </button>
            <button 
              onClick={handleCreateCourse}
              disabled={courseLoading}
-             className="bg-secondary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-75 disabled:cursor-wait"
+             className="bg-emerald-500 text-white border-2 border-emerald-600 px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[12px] shadow-[0_6px_0_rgba(16,185,129,1)] hover:shadow-[0_4px_0_rgba(16,185,129,1)] hover:translate-y-[2px] active:shadow-none active:translate-y-[6px] transition-all flex items-center gap-2 disabled:opacity-75 disabled:transform-none disabled:shadow-[0_6px_0_rgba(16,185,129,1)]"
            >
-             {courseLoading ? <Loader2 className="animate-spin" size={16} /> : <BookOpen size={16} />}
-             Start Learning
+             {courseLoading ? <Loader2 className="animate-spin" size={20} /> : <Rocket size={20} className="group-hover/btn:rotate-12" />}
+             Start Quest
            </button>
         </div>
       </header>
@@ -146,32 +146,32 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
       {/* Stats Grid */}
       <div className="grid md:grid-cols-12 gap-6">
         {/* Main Info Card */}
-        <div className="md:col-span-8 bg-gradient-to-br from-indigo-900 to-slate-900 rounded-[3rem] p-10 md:p-14 text-white relative overflow-hidden shadow-2xl shadow-indigo-900/20">
-          <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none">
+        <div className="md:col-span-8 bg-emerald-500 border-4 border-emerald-600 rounded-[2.5rem] p-10 md:p-14 text-white relative overflow-hidden shadow-[0_8px_0_rgba(16,185,129,1)] hover:-translate-y-1 hover:shadow-[0_12px_0_rgba(16,185,129,1)] transition-all flex flex-col justify-between group min-h-[300px]">
+          <div className="absolute top-0 right-0 p-10 opacity-20 pointer-events-none group-hover:scale-110 transition-transform duration-700">
              <Target size={300} strokeWidth={0.5} />
           </div>
           <div className="relative z-10 flex flex-col h-full justify-between gap-8">
              <div>
-                <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 backdrop-blur-md">
+                <div className="inline-flex items-center gap-2 bg-white/20 border-2 border-white/30 px-5 py-2 rounded-[1rem] text-[12px] font-black uppercase tracking-widest mb-6 backdrop-blur-md shadow-[0_4px_0_rgba(255,255,255,0.2)]">
                    Core Architecture
                 </div>
-                <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 tracking-tight leading-tight">{roadmap.title}</h2>
-                <p className="text-white/70 text-lg font-medium leading-relaxed max-w-2xl">{roadmap.description}</p>
+                <h2 className="text-4xl md:text-5xl font-display font-black mb-4 tracking-tight leading-tight drop-shadow-md">{roadmap.title}</h2>
+                <p className="text-emerald-100 text-xl font-bold leading-relaxed max-w-2xl">{roadmap.description}</p>
              </div>
              
              <div className="flex flex-wrap gap-4">
-                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex items-center gap-3 pr-8">
-                   <div className="p-2 bg-white/10 rounded-lg text-white"><Clock size={20} /></div>
+                <div className="bg-emerald-600/50 backdrop-blur-md border-2 border-emerald-400 rounded-[1.5rem] p-4 flex items-center gap-4 pr-8 shadow-[0_4px_0_rgba(16,185,129,0.5)]">
+                   <div className="w-12 h-12 bg-white rounded-xl text-emerald-600 flex items-center justify-center rotate-3 shadow-sm"><Clock size={24} /></div>
                    <div>
-                      <p className="text-[9px] font-black uppercase tracking-widest text-white/50">Est. Time</p>
-                      <p className="text-lg font-bold">~6 Months</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200">Est. Time</p>
+                      <p className="text-2xl font-black">~6 Months</p>
                    </div>
                 </div>
-                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex items-center gap-3 pr-8">
-                   <div className="p-2 bg-white/10 rounded-lg text-white"><Layers size={20} /></div>
+                <div className="bg-emerald-600/50 backdrop-blur-md border-2 border-emerald-400 rounded-[1.5rem] p-4 flex items-center gap-4 pr-8 shadow-[0_4px_0_rgba(16,185,129,0.5)]">
+                   <div className="w-12 h-12 bg-white rounded-xl text-emerald-600 flex items-center justify-center -rotate-3 shadow-sm"><Layers size={24} /></div>
                    <div>
-                      <p className="text-[9px] font-black uppercase tracking-widest text-white/50">Modules</p>
-                      <p className="text-lg font-bold">{roadmap.phases.length} Phases</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200">Map Size</p>
+                      <p className="text-2xl font-black">{roadmap.phases.length} Levels</p>
                    </div>
                 </div>
              </div>
@@ -179,13 +179,13 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
         </div>
 
         {/* Progress Card */}
-        <div className="md:col-span-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[3rem] p-10 flex flex-col items-center justify-center text-center shadow-sm">
-           <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-6">
-              <Activity size={32} />
+        <div className="md:col-span-4 bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-10 flex flex-col items-center justify-center text-center shadow-none hover:-translate-y-2 transition-all">
+           <div className="w-24 h-24 bg-emerald-100 text-emerald-500 rounded-[1.5rem] flex items-center justify-center mb-6 shadow-[0_6px_0_rgba(167,243,208,1)] rotate-3">
+              <Activity size={40} className="animate-pulse" />
            </div>
-           <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">Completion</p>
-           <h3 className="text-4xl font-display font-bold text-primary dark:text-white">0%</h3>
-           <p className="mt-4 text-sm font-medium text-slate-500">Start your journey today.</p>
+           <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">Campaign Progress</p>
+           <h3 className="text-5xl font-display font-black text-slate-800 dark:text-white drop-shadow-sm">0%</h3>
+           <p className="mt-4 text-base font-bold text-slate-500">Start your journey today.</p>
         </div>
       </div>
 
@@ -198,40 +198,40 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
               <div key={idx} className={`relative flex flex-col md:flex-row gap-8 items-start ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
                  
                  {/* Center Node */}
-                 <div className="absolute left-[13px] md:left-1/2 top-8 w-8 h-8 bg-white dark:bg-slate-900 border-4 border-indigo-500 rounded-full z-10 md:-ml-4 shadow-lg shadow-indigo-500/30 flex items-center justify-center">
-                    <div className="w-2.5 h-2.5 bg-indigo-500 rounded-full"></div>
+                 <div className="absolute left-[13px] md:left-1/2 top-8 w-8 h-8 bg-white dark:bg-slate-900 border-4 border-amber-500 rounded-full z-10 md:-ml-4 shadow-[0_4px_0_rgba(245,158,11,1)] flex items-center justify-center">
+                    <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
                  </div>
 
                  {/* Card */}
                  <div className="ml-16 md:ml-0 w-full md:w-[calc(50%-40px)] group perspective">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/30">
+                    <div className="bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_12px_0_rgba(226,232,240,1)] hover:border-amber-400">
                        <div className="flex justify-between items-start mb-6">
-                          <span className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest">{phase.duration}</span>
-                          <span className="text-2xl font-display font-bold text-slate-200 dark:text-slate-800">0{idx + 1}</span>
+                          <span className="bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border-2 border-amber-200 dark:border-amber-700 px-4 py-2 rounded-[1rem] text-[12px] font-black uppercase tracking-widest shadow-sm">{phase.duration}</span>
+                          <span className="text-4xl font-display font-black text-slate-200 dark:text-slate-800 drop-shadow-sm">0{idx + 1}</span>
                        </div>
                        
-                       <h3 className="text-2xl font-display font-bold text-slate-800 dark:text-slate-100 mb-3">{phase.title}</h3>
-                       <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-8">{phase.description}</p>
+                       <h3 className="text-3xl font-display font-black text-slate-800 dark:text-slate-100 mb-4 group-hover:text-amber-600 transition-colors">{phase.title}</h3>
+                       <p className="text-slate-500 dark:text-slate-400 text-lg font-bold leading-relaxed mb-8">{phase.description}</p>
                        
                        {/* Topics Dropdowns */}
-                       <div className="space-y-3">
+                       <div className="space-y-4">
                           {phase.topics?.map((topic, topicIdx) => {
                              const topicId = `${idx}-${topicIdx}`;
                              const isExpanded = expandedTopic === topicId;
                              
                              return (
-                                <div key={topicIdx} className="border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden bg-slate-50/50 dark:bg-slate-950/30">
+                                <div key={topicIdx} className="border-2 border-slate-200 dark:border-slate-800 rounded-[1.5rem] overflow-hidden bg-slate-50 dark:bg-slate-950/30 transition-all hover:border-amber-400 hover:shadow-[0_4px_0_rgba(251,191,36,1)]">
                                    <button 
                                      onClick={() => toggleTopic(topicId)}
-                                     className="w-full flex items-center justify-between p-4 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+                                     className="w-full flex items-center justify-between p-5 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-colors"
                                    >
-                                      <div className="flex items-center gap-3">
-                                         <div className={`p-1.5 rounded-lg ${isExpanded ? 'bg-indigo-500 text-white' : 'bg-slate-200 text-slate-500'}`}>
-                                            <Atom size={16} />
+                                      <div className="flex items-center gap-4">
+                                         <div className={`p-2 rounded-[1rem] shadow-sm ${isExpanded ? 'bg-amber-500 text-white shadow-[0_4px_0_rgba(245,158,11,1)]' : 'bg-white border-2 border-slate-200 text-slate-500'}`}>
+                                            <Atom size={20} className={isExpanded ? "animate-spin-slow" : ""} />
                                          </div>
-                                         <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{topic.title}</span>
+                                         <span className="font-black text-base text-slate-700 dark:text-slate-200">{topic.title}</span>
                                       </div>
-                                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                      {isExpanded ? <ChevronUp size={24} className="text-amber-500" strokeWidth={3} /> : <ChevronDown size={24} className="text-slate-400" strokeWidth={3} />}
                                    </button>
                                    
                                    {isExpanded && (
@@ -240,7 +240,7 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
                                             <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2 mt-4">Key Concepts</p>
                                             <div className="flex flex-wrap gap-2">
                                                {topic.concepts.map((concept, i) => (
-                                                  <span key={i} className="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700">
+                                                  <span key={i} className="text-[11px] font-black uppercase tracking-widest bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-3 py-1.5 rounded-lg border-2 border-slate-200 dark:border-slate-700 shadow-sm">
                                                      {concept}
                                                   </span>
                                                ))}
@@ -250,10 +250,10 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
                                          <div className="space-y-2">
                                             <p className="text-[10px] uppercase font-black text-slate-400 tracking-wider mb-2">Recommended Resources</p>
                                             {topic.resources.map((res, i) => (
-                                               <a key={i} href={res.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 group/link transition-colors">
+                                               <a key={i} href={res.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20 group/link transition-colors border-2 border-transparent hover:border-amber-200">
                                                   {getResourceIcon(res.type)}
-                                                  <span className="text-xs font-bold text-slate-600 dark:text-slate-300 flex-1 truncate">{res.title}</span>
-                                                  <ArrowRight size={12} className="opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all text-indigo-500" />
+                                                  <span className="text-xs font-bold text-slate-600 dark:text-slate-300 flex-1 truncate group-hover/link:text-amber-700 dark:group-hover/link:text-amber-400">{res.title}</span>
+                                                  <ArrowRight size={12} className="opacity-0 group-hover/link:opacity-100 -translate-x-2 group-hover/link:translate-x-0 transition-all text-amber-600" strokeWidth={3} />
                                                </a>
                                             ))}
                                          </div>
@@ -279,34 +279,34 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
     <div className="animate-reveal min-h-screen">
       {viewMode === 'input' ? (
         <div className="flex flex-col items-center justify-center py-20 px-4 max-w-4xl mx-auto text-center">
-           <div className="w-24 h-24 bg-gradient-to-tr from-slate-800 to-slate-900 rounded-[2rem] flex items-center justify-center text-white mb-10 shadow-2xl shadow-slate-900/10 ring-8 ring-slate-100 dark:ring-slate-800">
-              <Rocket size={40} />
+           <div className="w-28 h-28 bg-amber-400 border-4 border-amber-500 dark:border-amber-600 rounded-[2rem] flex items-center justify-center text-slate-900 mb-12 shadow-[0_8px_0_rgba(217,119,6,1)] rotate-3 hover:rotate-6 transition-transform">
+              <Rocket size={56} strokeWidth={2.5} className="animate-pulse" />
            </div>
-           <h1 className="text-5xl md:text-7xl font-display font-bold text-slate-900 dark:text-white mb-8 tracking-tighter">
-             Master <span className="text-secondary">Anything.</span>
+           <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-display font-black text-slate-800 dark:text-white mb-6 tracking-tighter drop-shadow-sm leading-tight">
+             Master <span className="text-amber-500">Anything.</span>
            </h1>
-           <p className="text-xl text-slate-500 dark:text-slate-400 mb-12 max-w-2xl font-medium leading-relaxed">
-             From coding to cooking, startups to science. Our AI architect constructs a professional learning protocol for any goal.
+           <p className="text-xl md:text-2xl text-slate-500 dark:text-slate-400 mb-16 max-w-3xl font-bold leading-relaxed">
+             From coding to cooking, startups to science. Our AI constructs a perfect path for any quest you desire.
            </p>
            
            <div className="w-full max-w-2xl relative group z-20">
-              <div className="absolute -inset-1 bg-slate-200 dark:bg-slate-800 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-              <div className="relative flex items-center bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl p-2 border border-slate-100 dark:border-slate-800">
-                 <Search className="ml-6 text-slate-400" size={24} />
+              <div className="absolute -inset-1 bg-slate-200 dark:bg-slate-800 rounded-[2.5rem] blur-xl opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+              <div className="relative flex items-center bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] shadow-[0_6px_0_rgba(226,232,240,1)] border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 p-2 hover:-translate-y-1 hover:shadow-[0_10px_0_rgba(226,232,240,1)] transition-all">
+                 <Search className="ml-6 text-slate-400 group-focus-within:text-amber-500 transition-colors" size={28} strokeWidth={3} />
                  <input 
                    type="text" 
                    value={input}
                    onChange={(e) => setInput(e.target.value)}
                    onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
-                   placeholder="e.g. Digital Marketing, Quantum Physics, French Cuisine..."
-                   className="w-full bg-transparent border-none text-xl font-bold text-slate-800 dark:text-white placeholder:text-slate-300 focus:ring-0 px-6 py-5"
+                   placeholder="e.g. Master React, AI Engineer..."
+                   className="w-full bg-transparent border-none text-2xl font-black text-slate-800 dark:text-white placeholder:text-slate-300 focus:ring-0 px-6 py-6 outline-none"
                  />
                  <button 
                   onClick={handleGenerate}
                   disabled={loading || !input.trim()}
-                  className="bg-slate-900 text-white p-5 rounded-[1.5rem] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-slate-900/20 aspect-square flex items-center justify-center"
+                  className="bg-amber-400 text-slate-900 p-6 rounded-[1.5rem] hover:translate-y-[2px] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:transform-none disabled:shadow-[0_4px_0_rgba(217,119,6,1)] shadow-[0_4px_0_rgba(217,119,6,1)] aspect-square flex items-center justify-center border-2 border-amber-500"
                  >
-                   {loading ? <Loader2 className="animate-spin" size={24} /> : <ArrowRight size={24} />}
+                   {loading ? <Loader2 className="animate-spin" size={28} strokeWidth={3} /> : <Rocket size={28} strokeWidth={3} />}
                  </button>
               </div>
            </div>
@@ -318,12 +318,12 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
              </div>
            )}
 
-           <div className="flex gap-3 mt-12 flex-wrap justify-center">
+           <div className="flex flex-wrap gap-4 mt-16 justify-center">
               {['Launch a Startup', 'Learn Piano', 'Data Science', 'Speak Japanese'].map(tag => (
                 <button 
                   key={tag}
                   onClick={() => { setInput(tag); }}
-                  className="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-500 uppercase tracking-widest hover:border-slate-400 hover:text-slate-800 hover:shadow-lg hover:-translate-y-1 transition-all"
+                  className="px-6 py-4 bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-[1.5rem] text-[12px] font-black text-slate-500 uppercase tracking-[0.2em] shadow-[0_4px_0_rgba(226,232,240,1)] hover:translate-y-[2px] hover:border-amber-400 hover:text-amber-600 hover:shadow-[0_2px_0_rgba(251,191,36,1)] active:translate-y-[4px] active:shadow-none transition-all"
                 >
                   {tag}
                 </button>
@@ -337,26 +337,26 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
                    <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
                 </div>
                 
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid md:grid-cols-2 gap-6">
                   {history.map(item => (
                     <div 
                       key={item.id} 
                       onClick={() => { setResult(item.road_data); setViewMode('roadmap'); }}
-                      className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/10 transition-all flex justify-between items-start"
+                      className="group bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 p-6 rounded-[2rem] cursor-pointer hover:border-amber-400 dark:hover:border-amber-500 hover:-translate-y-2 hover:shadow-[0_10px_0_rgba(226,232,240,1)] dark:hover:shadow-[0_10px_0_rgba(30,41,59,1)] transition-all flex justify-between items-start"
                     >
                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                             <span className="text-[10px] uppercase font-bold text-slate-400">{new Date(item.created_at).toLocaleDateString()}</span>
+                          <div className="flex items-center gap-2 mb-3">
+                             <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                             <span className="text-[10px] uppercase font-black text-slate-400 tracking-widest">{new Date(item.created_at).toLocaleDateString()}</span>
                           </div>
-                          <h4 className="font-bold text-slate-800 dark:text-slate-200 text-lg group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{item.role}</h4>
-                          <p className="text-sm text-slate-500 mt-1 line-clamp-1">{item.title}</p>
+                          <h4 className="font-black text-slate-800 dark:text-slate-200 text-xl group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors mb-1">{item.role}</h4>
+                          <p className="text-sm font-bold text-slate-500 line-clamp-1">{item.title}</p>
                        </div>
                        <button 
                          onClick={(e) => handleDelete(e, item.id)}
-                         className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors opacity-0 group-hover:opacity-100"
+                         className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95"
                        >
-                          <Trash2 size={16} />
+                          <Trash2 size={20} strokeWidth={2.5} />
                        </button>
                     </div>
                   ))}

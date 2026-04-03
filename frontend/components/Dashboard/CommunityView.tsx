@@ -30,37 +30,40 @@ const CommunityView: React.FC = () => {
   };
 
   return (
-    <div className="animate-reveal space-y-12 relative">
-      <div className="flex justify-between items-start">
+    <div className="animate-reveal space-y-12 relative pb-20">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b-4 border-slate-100 dark:border-slate-800">
         <div>
-          <h1 className="text-3xl font-display font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest leading-none">Community Chat</h1>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Talk, share, and learn with others.</p>
+          <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">Tavern</p>
+          <h1 className="text-4xl md:text-5xl font-display font-black text-slate-800 dark:text-white uppercase tracking-widest leading-none drop-shadow-sm">Community</h1>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-secondary text-white px-8 py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-secondary/20 flex items-center gap-3 active:scale-95 transition-all"
+          className="w-full md:w-auto px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[12px] transition-all bg-emerald-500 text-white shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none flex items-center justify-center gap-2 group"
         >
-          <Plus size={18} /> New Post
+          <Plus size={18} strokeWidth={3} className="group-hover:rotate-90 transition-transform" /> Start Quest
         </button>
-      </div>
+      </header>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-lg p-8 rounded-[2rem] shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-primary dark:text-white">New Post</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-rose-500">
-                <X size={24} />
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-lg p-10 rounded-[2.5rem] border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-8 pb-6 border-b-2 border-slate-100 dark:border-slate-800">
+              <div>
+                <p className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-1">New Message</p>
+                <h3 className="text-3xl font-display font-black text-slate-800 dark:text-white uppercase tracking-wider">Post to Board</h3>
+              </div>
+              <button onClick={() => setIsModalOpen(false)} className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:-rotate-12 transition-all">
+                <X size={24} strokeWidth={2.5} />
               </button>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Tag</label>
+                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Category</label>
                 <select 
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-bold text-sm outline-none focus:border-secondary"
+                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-500 focus:bg-white shadow-sm transition-all appearance-none cursor-pointer"
                 >
                   <option>Academics</option>
                   <option>Collaboration</option>
@@ -71,20 +74,20 @@ const CommunityView: React.FC = () => {
               </div>
               
               <div>
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Your Message</label>
+                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Your Message</label>
                 <textarea 
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="What do you want to share?"
-                  className="w-full h-32 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 font-medium text-primary dark:text-white outline-none focus:border-secondary resize-none"
+                  placeholder="What knowledge do you seek?"
+                  className="w-full h-40 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl p-5 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-500 focus:bg-white shadow-sm resize-none transition-all placeholder:text-slate-400"
                 />
               </div>
               
               <button 
                 onClick={handlePost}
-                className="w-full bg-primary dark:bg-secondary text-white py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                className="w-full px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[13px] transition-all bg-emerald-500 text-white shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none flex items-center justify-center gap-2 mt-4"
               >
-                <Send size={16} /> Post
+                <Send size={18} strokeWidth={3} className="mr-1" /> Post Message
               </button>
             </div>
           </div>
@@ -94,62 +97,76 @@ const CommunityView: React.FC = () => {
       <div className="grid lg:grid-cols-4 gap-12">
         <div className="lg:col-span-3 space-y-6">
           {threads.map((thread, i) => (
-            <div key={i} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-10 hover:shadow-lg transition-all cursor-pointer">
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center font-bold text-secondary border border-slate-100 dark:border-slate-800 uppercase">
-                    {thread.user.split(' ')[0][0]}{thread.user.split(' ')[1][0]}
-                  </div>
-                  <div>
-                    <p className="font-bold text-primary dark:text-white">{thread.user}</p>
-                    <p className="text-[10px] font-bold text-slate-300 dark:text-slate-600 uppercase tracking-widest">{thread.time}</p>
-                  </div>
+            <div key={i} className="bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 hover:-translate-y-2 hover:shadow-[0_12px_0_rgba(226,232,240,1)] transition-all cursor-pointer group flex flex-col sm:flex-row gap-6">
+              
+              {/* Avatar Column */}
+              <div className="flex flex-col items-center gap-3 shrink-0">
+                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-[1.25rem] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center font-black text-slate-700 dark:text-slate-300 text-lg uppercase group-hover:bg-emerald-100 group-hover:text-emerald-600 group-hover:border-emerald-200 transition-colors shadow-sm">
+                  {thread.user.split(' ').map(n => n[0]).join('')}
                 </div>
-                <span className="bg-slate-50 dark:bg-slate-800 px-4 py-1.5 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-100 dark:border-slate-800">{thread.tag}</span>
+                <div className="flex flex-col items-center">
+                   <div className="flex items-center gap-1 text-slate-400 font-bold hover:text-emerald-500 cursor-pointer p-1 rounded-lg transition-colors">
+                     <ThumbsUp size={16} strokeWidth={3} className="group-hover:-rotate-12 transition-transform" /> 
+                   </div>
+                   <span className="text-[11px] font-black text-slate-500 mt-1">{thread.likes}</span>
+                </div>
               </div>
-              
-              <h3 className="text-2xl font-bold text-primary dark:text-white mb-10 leading-snug hover:text-secondary transition-colors">{thread.title}</h3>
-              
-              <div className="flex items-center justify-between pt-8 border-t border-slate-50 dark:border-slate-800">
-                <div className="flex gap-10">
-                  <button className="flex items-center gap-2 text-slate-400 hover:text-secondary font-bold text-xs transition-colors">
-                    <ThumbsUp size={18} /> {thread.likes}
+
+              {/* Content Column */}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-3 mb-3">
+                  <span className="font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-lg text-sm border-2 border-slate-100 dark:border-slate-700">{thread.user}</span>
+                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{thread.time}</span>
+                  <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border-2 border-blue-100 shadow-sm ml-auto sm:ml-0">{thread.tag}</span>
+                </div>
+                
+                <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white mb-6 leading-tight group-hover:text-emerald-600 transition-colors line-clamp-2 md:line-clamp-none">
+                  {thread.title}
+                </h3>
+                
+                <div className="flex items-center gap-4">
+                  <button className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 font-bold text-sm bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl transition-all border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-200 hover:bg-emerald-50 shadow-sm">
+                    <MessageSquare size={16} strokeWidth={2.5} /> {thread.replies} Replies
                   </button>
-                  <button className="flex items-center gap-2 text-slate-400 hover:text-secondary font-bold text-xs transition-colors">
-                    <MessageSquare size={18} /> {thread.replies}
+                  <button className="flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm">
+                    <Share2 size={16} strokeWidth={2.5} />
                   </button>
                 </div>
-                <button className="text-slate-200 dark:text-slate-700 hover:text-secondary transition-colors">
-                  <Share2 size={18} />
-                </button>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="space-y-10">
-          <div className="bg-slate-50 dark:bg-slate-900/50 p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800">
-            <h4 className="text-xl font-black text-primary dark:text-white mb-8 flex items-center gap-3">
-              <Hash className="text-secondary" /> Popular Nodes
+        <div className="space-y-8">
+          {/* Tags Box */}
+          <div className="bg-slate-50 dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-none">
+            <h4 className="text-xl font-display font-black text-slate-800 dark:text-white uppercase tracking-wider mb-6 flex items-center gap-3">
+              <Hash size={24} className="text-blue-500" strokeWidth={3} /> Trending
             </h4>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {['#ReactJS', '#Tech2024', '#Internships', '#GoLang', '#GlobalTech', '#Enterprise', '#Hackathon'].map((tag) => (
-                <button key={tag} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-secondary hover:text-secondary transition-all">
+                <button key={tag} className="bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm hover:shadow-[0_4px_0_rgba(191,219,254,1)] hover:-translate-y-1 active:translate-y-0 active:shadow-none">
                   {tag}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="bg-secondary text-white p-10 rounded-[3rem] shadow-xl text-center border border-transparent dark:border-secondary/20">
-            <Users size={48} className="mx-auto mb-6" />
-            <h4 className="text-2xl font-black mb-4">Pro Mentors</h4>
-            <p className="text-white/60 text-sm font-medium leading-relaxed mb-8">
-              Join the elite alumni network and get direct guidance from industry pros.
-            </p>
-            <button className="w-full bg-white text-secondary py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-slate-50 transition-all">
-              Apply to Mentor
-            </button>
+          {/* Mentors Card */}
+          <div className="bg-amber-400 dark:bg-amber-500 border-4 border-amber-500 dark:border-amber-600 text-slate-900 p-8 rounded-[2.5rem] shadow-[0_8px_0_rgba(217,119,6,1)] relative overflow-hidden group hover:-translate-y-1 transition-transform">
+            <div className="absolute top-[-20%] right-[-20%] w-48 h-48 bg-white/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+            <div className="relative z-10 text-center">
+              <div className="w-20 h-20 bg-white/20 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 backdrop-blur-sm border-2 border-white/40 shadow-inner group-hover:rotate-6 transition-transform">
+                 <Users size={36} className="text-slate-900" strokeWidth={2.5} />
+              </div>
+              <h4 className="text-3xl font-display font-black mb-3 tracking-wide drop-shadow-sm uppercase">Pro Mentors</h4>
+              <p className="text-slate-800/80 text-sm font-bold leading-relaxed mb-8">
+                Join the elite alumni network and get direct guidance from industry pros.
+              </p>
+              <button className="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-widest text-[12px] hover:bg-slate-800 transition-all shadow-[0_4px_0_rgba(0,0,0,0.5)] active:translate-y-[4px] active:shadow-none">
+                Apply to Mentor
+              </button>
+            </div>
           </div>
         </div>
       </div>

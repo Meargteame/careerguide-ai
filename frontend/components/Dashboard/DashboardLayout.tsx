@@ -51,7 +51,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
   const menuItems = [
     { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'courses', label: 'Courses', icon: BookOpen },
-    { id: 'roadmaps', label: 'My Plan', icon: MapIcon },
+    { id: 'roadmaps', label: 'AI Generator', icon: MapIcon },
     { id: 'careers', label: 'Jobs', icon: ShieldCheck },
     { id: 'community', label: 'Chat', icon: Users },
     { id: 'progress', label: 'My Stats', icon: LineChart },
@@ -101,11 +101,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
       `}>
         {/* Brand Header */}
         <div className="h-20 flex items-center px-8 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('overview')}>
-            <div className="w-9 h-9 bg-secondary rounded-lg flex items-center justify-center text-white shadow-lg shadow-secondary/20">
-              <GraduationCap size={20} strokeWidth={2.5} />
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveTab('overview')}>
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-[0_4px_0_rgba(30,58,138,1)] rotate-3 group-hover:rotate-6 transition-transform">
+              <GraduationCap size={22} strokeWidth={2.5} />
             </div>
-            <span className="text-primary dark:text-white font-display font-bold text-xl tracking-tight">CareerGuide</span>
+            <span className="text-slate-900 dark:text-white font-display font-black text-2xl tracking-tight">Meridian</span>
           </div>
         </div>
 
@@ -121,21 +121,21 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
                   setActiveTab(item.id as Tab);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-                  ${isActive 
-                    ? 'bg-secondary text-white shadow-lg shadow-secondary/25' 
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-secondary'
+                className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-[1.25rem] transition-all duration-200 group font-bold
+                  ${isActive
+                    ? 'bg-blue-500 text-white shadow-[0_4px_0_rgba(37,99,235,1)] -translate-y-[2px]'
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 border-2 border-transparent hover:border-slate-200 dark:hover:bg-slate-800 dark:hover:border-slate-700 hover:text-blue-600'
                   }
                 `}
               >
-                <Icon size={20} strokeWidth={2} className={`transition-colors ${isActive ? 'text-white' : 'group-hover:text-secondary'}`} />
-                <span className={`text-sm font-semibold ${isActive ? 'text-white' : ''}`}>
+                <Icon size={22} strokeWidth={2.5} className={`transition-colors ${isActive ? 'text-white' : 'group-hover:text-blue-600'}`} />
+                <span className={`text-[15px] ${isActive ? 'text-white font-black' : 'font-bold'}`}>
                   {item.label}
                 </span>
-                
+
                 {/* Active Indicator Strip */}
                 {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  <div className="ml-auto w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse" />
                 )}
               </button>
             );

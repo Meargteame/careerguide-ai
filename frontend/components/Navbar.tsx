@@ -28,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate }) => {
           <div className="w-12 h-12 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-2xl flex items-center justify-center text-white shadow-[0_4px_15px_rgba(59,130,246,0.3)] group-hover:scale-105 group-hover:-rotate-3 transition-transform">
             <GraduationCap size={26} strokeWidth={2.5} />
           </div>
-          <span className="text-slate-900 font-display font-black text-2xl tracking-tight">Career<span className="text-blue-600">Guide</span></span>
+          <span className="text-slate-900 font-display font-black text-2xl tracking-tight">Merid<span className="text-blue-600">ian</span></span>
         </div>
 
         {/* Desktop Nav */}
