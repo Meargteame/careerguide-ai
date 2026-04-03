@@ -15,7 +15,7 @@ const AdminManagement: React.FC = () => {
   return (
     <div className="animate-reveal space-y-12">
       <header>
-        <h1 className="text-5xl font-extrabold text-primary dark:text-white tracking-tight mb-3">Admin Dashboard</h1>
+        <h1 className="text-5xl font-extrabold text-slate-800 dark:text-white tracking-tight mb-3">Admin Dashboard</h1>
         <p className="text-slate-400 dark:text-slate-500 font-medium text-lg">Manage users and see feedback.</p>
       </header>
 
@@ -28,7 +28,7 @@ const AdminManagement: React.FC = () => {
           <button 
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center gap-2 pb-4 font-bold text-sm uppercase tracking-widest transition-all ${activeTab === tab.id ? 'text-secondary border-b-2 border-secondary' : 'text-slate-300 hover:text-primary dark:hover:text-white'}`}
+            className={`flex items-center gap-2 pb-4 font-bold text-sm uppercase tracking-widest transition-all ${activeTab === tab.id ? 'text-blue-500 border-b-2 border-blue-500' : 'text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-white'}`}
           >
             <tab.icon size={18} />
             {tab.label}
@@ -68,31 +68,31 @@ const AdminManagement: React.FC = () => {
                   <tr key={u.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors group">
                     <td className="px-10 py-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center text-secondary font-bold">
+                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold">
                           {u.name.charAt(0)}
                         </div>
                         <div>
-                          <p className="font-bold text-primary dark:text-white">{u.name}</p>
+                          <p className="font-bold text-slate-800 dark:text-white">{u.name}</p>
                           <p className="text-[10px] text-slate-400 font-medium">{u.email}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-10 py-6 text-sm font-bold text-slate-600 dark:text-slate-400">{u.year}</td>
                     <td className="px-10 py-6">
-                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${u.role === 'admin' ? 'bg-brand/10 text-brand' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${u.role === 'admin' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
                         {u.role}
                       </span>
                     </td>
                     <td className="px-10 py-6">
                       <div className="flex items-center gap-3">
                         <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden w-24">
-                          <div className="h-full bg-success" style={{ width: u.progress }} />
+                          <div className="h-full bg-emerald-500" style={{ width: u.progress }} />
                         </div>
                         <span className="text-xs font-bold text-slate-400">{u.progress}</span>
                       </div>
                     </td>
                     <td className="px-10 py-6 text-right">
-                      <button className="p-2 text-slate-300 hover:text-secondary transition-all">
+                      <button className="p-2 text-slate-300 dark:text-slate-600 hover:text-blue-500 transition-all">
                         <ArrowUpRight size={20} />
                       </button>
                     </td>
@@ -107,25 +107,25 @@ const AdminManagement: React.FC = () => {
       {activeTab === 'feedback' && (
         <div className="grid md:grid-cols-2 gap-8">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-10 rounded-[2.5rem] shadow-sm hover:border-secondary transition-all">
+            <div key={i} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-10 rounded-[2.5rem] shadow-sm hover:border-blue-400 dark:hover:border-blue-500 transition-all">
               <div className="flex justify-between items-start mb-8">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center">
-                    <Mail className="text-slate-300" />
+                    <Mail className="text-slate-400 dark:text-slate-500" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-primary dark:text-white">Submission Review</h4>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-300">Lab Project Alpha</p>
+                    <h4 className="font-bold text-slate-800 dark:text-white">Submission Review</h4>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Lab Project Alpha</p>
                   </div>
                 </div>
-                <span className="bg-accent/10 text-accent px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Pending</span>
+                <span className="bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">Pending</span>
               </div>
               <p className="text-slate-500 dark:text-slate-400 font-medium mb-10 leading-relaxed italic">
                 "I have completed the microservices implementation for the local e-commerce project. Requesting faculty feedback on the architectural design."
               </p>
               <div className="flex gap-4">
-                <button className="flex-1 bg-secondary text-white py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-primary transition-all">Provide Feedback</button>
-                <button className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] text-slate-400">Archive</button>
+                <button className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-blue-700 transition-all">Provide Feedback</button>
+                <button className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all">Archive</button>
               </div>
             </div>
           ))}
@@ -134,26 +134,26 @@ const AdminManagement: React.FC = () => {
 
       {activeTab === 'roles' && (
         <div className="max-w-2xl mx-auto text-center space-y-12 py-20">
-          <Shield className="mx-auto text-secondary" size={80} strokeWidth={1} />
-          <h2 className="text-4xl font-display font-bold text-primary dark:text-white">Institutional Authority</h2>
-          <p className="text-slate-400 font-medium text-lg leading-relaxed">
+          <Shield className="mx-auto text-blue-500" size={80} strokeWidth={1} />
+          <h2 className="text-4xl font-display font-bold text-slate-800 dark:text-white">Institutional Authority</h2>
+          <p className="text-slate-400 dark:text-slate-500 font-medium text-lg leading-relaxed">
             As an administrator, you can grant faculty status or mentor roles to verified users. Use this protocol only for authorized personnel.
           </p>
           <div className="bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-10 rounded-[3rem] text-left">
              <div className="space-y-6">
                <div className="flex items-center justify-between p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-sm">
                  <div className="flex items-center gap-4">
-                   <Star className="text-secondary" />
-                   <span className="font-bold text-primary dark:text-white">Grant Admin Status</span>
+                   <Star className="text-blue-500" />
+                   <span className="font-bold text-slate-800 dark:text-white">Grant Admin Status</span>
                  </div>
-                 <button className="text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-secondary transition-colors">Configure Access</button>
+                 <button className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-500 transition-colors">Configure Access</button>
                </div>
                <div className="flex items-center justify-between p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-sm">
                  <div className="flex items-center gap-4">
                    <ShieldCheck className="text-emerald-500" />
-                   <span className="font-bold text-primary dark:text-white">Faculty Accreditation</span>
+                   <span className="font-bold text-slate-800 dark:text-white">Faculty Accreditation</span>
                  </div>
-                 <button className="text-[10px] font-black uppercase tracking-widest text-slate-300 hover:text-secondary transition-colors">Verify Credentials</button>
+                 <button className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-500 transition-colors">Verify Credentials</button>
                </div>
              </div>
           </div>

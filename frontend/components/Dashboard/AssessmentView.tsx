@@ -160,17 +160,17 @@ const AssessmentView: React.FC<AssessmentViewProps> = ({ userId }) => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest">
                     <span>Average Score</span>
-                    <span className="text-secondary">{avgScore}%</span>
+                    <span className="text-amber-300">{avgScore}%</span>
                   </div>
-                  <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-secondary h-full transition-all duration-1000" style={{ width: `${avgScore}%` }} />
+                  <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-amber-300 h-full transition-all duration-1000" style={{ width: `${avgScore}%` }} />
                   </div>
                 </div>
              </div>
           </div>
           
           <div className="bg-slate-50 dark:bg-slate-900/50 p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800">
-            <h4 className="text-lg font-black text-primary dark:text-white mb-6 uppercase tracking-tight">Rules</h4>
+            <h4 className="text-lg font-black text-slate-800 dark:text-white mb-6 uppercase tracking-tight">Rules</h4>
             <ul className="space-y-4 text-sm font-medium text-slate-500">
               <li className="flex gap-3">
                 <CheckCircle size={16} className="text-emerald-500 shrink-0 mt-1" />

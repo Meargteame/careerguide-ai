@@ -161,10 +161,10 @@ const LibraryView: React.FC<LibraryViewProps> = ({ userId }) => {
                 </div>
                 
                 <div className="flex items-center gap-4 text-sm font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-t-4 border-slate-100 dark:border-slate-800/50 pt-6 mt-6">
-                   <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl">
+                   <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-xl">
                       <Clock size={16} className="text-slate-400" /> {course.duration}
                    </div>
-                   <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl flex-1">
+                   <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-xl flex-1">
                       <Monitor size={16} className="text-slate-400" /> {course.modules.length} Modules
                    </div>
                 </div>

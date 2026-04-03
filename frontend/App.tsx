@@ -19,12 +19,18 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Defaulting strictly to light mode for the playful gamified look
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+  });
 
   useEffect(() => {
     const root = window.document.documentElement;
-    root.classList.remove('dark'); // Force light mode
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   // Supabase Auth Listener
@@ -80,7 +86,7 @@ function App() {
     }
   };
 
-  const toggleTheme = () => setTheme('light'); // Keeping it strictly light
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   const navigateTo = (newView: 'home' | 'login' | 'signup' | 'onboarding' | 'dashboard') => {
     if (newView === 'home') navigate('/');

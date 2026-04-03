@@ -127,7 +127,7 @@ const CourseView: React.FC<CourseViewProps> = ({ initialCourseData, onBack, isEn
              <button 
                disabled={isEnrolling} 
                onClick={handleEnroll} 
-               className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 disabled:opacity-50 flex items-center justify-center gap-2"
+               className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 py-3 rounded-xl font-bold text-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg shadow-slate-900/20 disabled:opacity-50 flex items-center justify-center gap-2"
              >
                {isEnrolling ? <> <Loader2 className="animate-spin" size={16} /> Joining... </> : 'Start Course'}
              </button>
@@ -254,7 +254,7 @@ const CourseView: React.FC<CourseViewProps> = ({ initialCourseData, onBack, isEn
 
                <button 
                  onClick={handleCompleteLesson}
-                 className="flex items-center gap-2 px-8 py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-slate-800 shadow-xl shadow-slate-900/10 hover:shadow-slate-900/20 hover:-translate-y-0.5 transition-all"
+                 className="flex items-center gap-2 px-8 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm hover:bg-slate-800 dark:hover:bg-slate-100 shadow-xl shadow-slate-900/10 hover:shadow-slate-900/20 hover:-translate-y-0.5 transition-all"
                >
                   Finish & Next <ArrowRight size={16} />
                </button>

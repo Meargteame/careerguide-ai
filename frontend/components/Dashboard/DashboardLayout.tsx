@@ -148,12 +148,15 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
           {/* Theme Toggle */}
           <button 
             onClick={onToggleTheme}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:border-secondary/50 transition-all text-sm font-medium"
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-sm font-medium"
           >
             <span className="flex items-center gap-2">
-              {theme === 'light' ? <Sun size={18} /> : <Moon size={18} />}
-              <span>{theme === 'light' ? 'Light Mode' : 'Dark Mode'}</span>
+              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
             </span>
+            <div className={`w-10 h-6 rounded-full border-2 transition-colors flex items-center px-0.5 ${theme === 'dark' ? 'bg-blue-500 border-blue-600' : 'bg-slate-200 border-slate-300'}`}>
+              <div className={`w-4 h-4 rounded-full bg-white shadow transition-transform ${theme === 'dark' ? 'translate-x-4' : 'translate-x-0'}`} />
+            </div>
           </button>
 
           {/* User Profile / Logout */}
