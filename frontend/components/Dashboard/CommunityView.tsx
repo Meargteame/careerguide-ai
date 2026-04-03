@@ -48,51 +48,51 @@ const CommunityView: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
           <div className="pointer-events-auto bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
             <div className="p-10">
-            <div className="flex justify-between items-center mb-8 pb-6 border-b-2 border-slate-100 dark:border-slate-800">
-              <div>
-                <p className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-1">New Message</p>
-                <h3 className="text-3xl font-display font-black text-slate-800 dark:text-white uppercase tracking-wider">Post to Board</h3>
+              <div className="flex justify-between items-center mb-8 pb-6 border-b-2 border-slate-100 dark:border-slate-800">
+                <div>
+                  <p className="text-xs font-black text-emerald-500 uppercase tracking-widest mb-1">New Message</p>
+                  <h3 className="text-3xl font-display font-black text-slate-800 dark:text-white uppercase tracking-wider">Post to Board</h3>
+                </div>
+                <button onClick={() => setIsModalOpen(false)} className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:-rotate-12 transition-all">
+                  <X size={24} strokeWidth={2.5} />
+                </button>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:-rotate-12 transition-all">
-                <X size={24} strokeWidth={2.5} />
-              </button>
-            </div>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Category</label>
-                <select 
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-500 focus:bg-white shadow-sm transition-all appearance-none cursor-pointer"
+
+              <div className="space-y-6">
+                <div>
+                  <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Category</label>
+                  <select
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-500 focus:bg-white shadow-sm transition-all appearance-none cursor-pointer"
+                  >
+                    <option>Academics</option>
+                    <option>Collaboration</option>
+                    <option>DevOps</option>
+                    <option>Career</option>
+                    <option>General</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Your Message</label>
+                  <textarea
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder="What knowledge do you seek?"
+                    className="w-full h-40 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl p-5 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-500 focus:bg-white shadow-sm resize-none transition-all placeholder:text-slate-400"
+                  />
+                </div>
+
+                <button
+                  onClick={handlePost}
+                  className="w-full px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[13px] transition-all bg-emerald-500 text-white shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none flex items-center justify-center gap-2 mt-4"
                 >
-                  <option>Academics</option>
-                  <option>Collaboration</option>
-                  <option>DevOps</option>
-                  <option>Career</option>
-                  <option>General</option>
-                </select>
+                  <Send size={18} strokeWidth={3} className="mr-1" /> Post Message
+                </button>
               </div>
-              
-              <div>
-                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Your Message</label>
-                <textarea 
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="What knowledge do you seek?"
-                  className="w-full h-40 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl p-5 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-500 focus:bg-white shadow-sm resize-none transition-all placeholder:text-slate-400"
-                />
-              </div>
-              
-              <button 
-                onClick={handlePost}
-                className="w-full px-8 py-5 rounded-2xl font-black uppercase tracking-widest text-[13px] transition-all bg-emerald-500 text-white shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none flex items-center justify-center gap-2 mt-4"
-              >
-                <Send size={18} strokeWidth={3} className="mr-1" /> Post Message
-              </button>
             </div>
           </div>
-        </div>
         </div>
       )}
 
