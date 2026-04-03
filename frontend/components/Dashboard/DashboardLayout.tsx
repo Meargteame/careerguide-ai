@@ -110,7 +110,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
         </div>
 
         {/* Navigation Items */}
-        <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto py-6 px-4 space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -218,7 +218,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
         </header>
 
         {/* Dashboard Content Scroller */}
-        <div className="flex-1 overflow-y-auto scroll-smooth bg-slate-50/50 dark:bg-black/20 p-4 md:p-8">
+        <div className="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-black/20 p-4 md:p-8">
           <div className="max-w-6xl mx-auto space-y-8 pb-20">
             {renderContent()}
           </div>
