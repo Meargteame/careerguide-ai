@@ -1,6 +1,6 @@
-# CareerGuide
+# Meridian
 
-CareerGuide is a web application designed to help users explore career options, access guidance, and find resources for professional development.
+Meridian is a web application designed to help users explore career options, access guidance, and find resources for professional development.
 
 ## Features
 - Browse career paths and industries
