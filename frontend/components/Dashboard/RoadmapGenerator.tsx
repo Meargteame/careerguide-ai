@@ -118,11 +118,11 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
       {/* Dynamic Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
         <div className="space-y-1">
-          <button onClick={() => setViewMode('input')} className="group flex items-center gap-3 text-slate-400 hover:text-secondary transition-colors font-bold text-xs uppercase tracking-widest mb-2">
+          <button onClick={() => setViewMode('input')} className="group flex items-center gap-3 text-slate-400 hover:text-blue-500 transition-colors font-bold text-xs uppercase tracking-widest mb-2">
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back
           </button>
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-primary dark:text-white tracking-tighter">
-            Plan: <span className="text-secondary">{roadmap.role}</span>
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-slate-800 dark:text-white tracking-tighter">
+            Plan: <span className="text-blue-500">{roadmap.role}</span>
           </h1>
           <p className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
             AI Generated Path • Easy to follow

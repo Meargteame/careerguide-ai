@@ -165,7 +165,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
                {user.name.charAt(0)}
              </div>
              <div className="flex-1 min-w-0">
-               <div className="text-sm font-bold text-primary dark:text-white truncate">{user.name}</div>
+               <div className="text-sm font-bold text-slate-800 dark:text-white truncate">{user.name}</div>
                <div className="text-xs text-slate-400 truncate capitalize">{user.role}</div>
              </div>
              <button 
@@ -185,10 +185,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
         {/* Mobile Header (Only visible on small screens) */}
         <header className="lg:hidden h-16 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 sticky top-0 z-30">
           <div className="flex items-center gap-3">
-            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-slate-500 hover:text-primary dark:hover:text-white">
+            <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-slate-500 hover:text-slate-800 dark:hover:text-white">
               <Menu size={24} />
             </button>
-            <span className="font-display font-bold text-lg text-primary dark:text-white truncate">
+            <span className="font-display font-bold text-lg text-slate-800 dark:text-white truncate">
                {menuItems.find(i => i.id === activeTab)?.label}
             </span>
           </div>
@@ -199,7 +199,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
 
         {/* Desktop Header */}
         <header className="hidden lg:flex h-16 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 items-center justify-between px-8 sticky top-0 z-30">
-          <h1 className="font-display font-bold text-2xl text-primary dark:text-white">
+          <h1 className="font-display font-bold text-2xl text-slate-800 dark:text-white">
             {menuItems.find(i => i.id === activeTab)?.label}
           </h1>
           <div className="flex items-center gap-4">

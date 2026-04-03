@@ -88,7 +88,7 @@ const QuizRunner: React.FC<QuizRunnerProps> = ({ topic, onClose, onComplete }) =
           <h3 className="text-3xl font-black text-slate-800 dark:text-white mb-4">Quiz Error</h3>
           <p className="text-slate-500 dark:text-slate-400 mb-10 text-lg font-medium">We couldn't make the quiz right now. Please try again.</p>
           <div className="flex gap-4 justify-center">
-             <button onClick={onClose} className="px-10 py-4 bg-slate-100 dark:bg-slate-800 rounded-2xl font-bold text-slate-500 hover:text-primary transition-all">Close</button>
+             <button onClick={onClose} className="px-10 py-4 bg-slate-100 dark:bg-slate-800 rounded-2xl font-bold text-slate-500 hover:text-slate-800 dark:hover:text-white transition-all">Close</button>
              <button onClick={() => window.location.reload()} className="px-10 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg shadow-blue-600/20">Retry</button>
           </div>
         </div>
@@ -101,9 +101,9 @@ const QuizRunner: React.FC<QuizRunnerProps> = ({ topic, onClose, onComplete }) =
     return (
       <div className="fixed inset-0 z-[200] bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-6 animate-reveal">
         <div className="bg-white dark:bg-slate-900 p-16 rounded-[3rem] shadow-2xl max-w-md w-full text-center border border-slate-100 dark:border-slate-800 relative overflow-hidden">
-          <div className="absolute top-0 inset-x-0 h-3 bg-gradient-to-r from-secondary to-indigo-600" />
+          <div className="absolute top-0 inset-x-0 h-3 bg-gradient-to-r from-blue-500 to-indigo-600" />
           
-          <div className="w-24 h-24 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-8 text-secondary">
+          <div className="w-24 h-24 bg-blue-100 dark:bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-8 text-blue-500">
              <Award size={48} strokeWidth={1.5} />
           </div>
 

@@ -63,8 +63,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, onNavigateToRoadmap
       {/* Dynamic Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
         <div className="space-y-1">
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-primary dark:text-white tracking-tighter">
-            Overall Status: <span className="text-secondary">Ready.</span>
+          <h1 className="text-4xl md:text-5xl font-display font-bold text-slate-800 dark:text-white tracking-tighter">
+            Overall Status: <span className="text-blue-500">Ready.</span>
           </h1>
           <p className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
             Welcome back, {user.name} • Student
@@ -72,12 +72,12 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, onNavigateToRoadmap
         </div>
         <div className="flex items-center gap-3">
            <div className="glass dark:bg-slate-900/50 px-6 py-4 rounded-3xl border border-slate-100 dark:border-slate-800 flex items-center gap-4">
-              <div className="w-10 h-10 bg-success/10 rounded-xl flex items-center justify-center text-success">
+              <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-500">
                  <CheckCircle size={20} />
               </div>
               <div>
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Account Status</p>
-                 <p className="text-sm font-bold text-primary dark:text-white">Active</p>
+                 <p className="text-sm font-bold text-slate-800 dark:text-white">Active</p>
               </div>
            </div>
         </div>
@@ -197,10 +197,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, onNavigateToRoadmap
       <section className="space-y-8">
          <div className="flex justify-between items-end">
             <div>
-               <h3 className="text-2xl font-display font-bold text-primary dark:text-white tracking-tight">Recent Activity</h3>
+               <h3 className="text-2xl font-display font-bold text-slate-800 dark:text-white tracking-tight">Recent Activity</h3>
                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Logs from your learning network</p>
             </div>
-            <button className="text-[10px] font-black text-secondary uppercase tracking-widest flex items-center gap-2 hover:underline">
+            <button className="text-[10px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-2 hover:underline">
                View All History <ArrowRight size={14} />
             </button>
          </div>
