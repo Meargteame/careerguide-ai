@@ -97,7 +97,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
   };
 
   return (
-    <div className="flex bg-white dark:bg-slate-950 min-h-screen transition-colors duration-300 relative overflow-hidden">
+    <div className="flex bg-white dark:bg-slate-950 min-h-screen transition-colors duration-300 relative">
       <NotificationToast notifications={notifications} onDismiss={dismiss} />
       
       {/* Mobile Menu Overlay */}
@@ -196,7 +196,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0 h-screen">
         
         {/* Mobile Header (Only visible on small screens) */}
         <header className="lg:hidden h-20 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 sticky top-0 z-30">

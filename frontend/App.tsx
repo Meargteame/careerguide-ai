@@ -12,6 +12,7 @@ import SignUpPage from './components/Auth/SignUpPage';
 import OnboardingPage from './components/Auth/OnboardingPage';
 import DashboardLayout from './components/Dashboard/DashboardLayout';
 import QuizPage from './components/Dashboard/QuizPage';
+import SharedRoadmapPage from './components/SharedRoadmapPage';
 import { User } from './types';
 import { supabase } from './services/supabaseClient';
 
@@ -136,6 +137,7 @@ function App() {
       <Route path="/quiz/:topic" element={
         user ? <QuizPage /> : <Navigate to="/login" />
       } />
+      <Route path="/roadmap/:id" element={<SharedRoadmapPage />} />
       <Route path="/" element={
         <div className="min-h-screen bg-white transition-colors duration-300">
           <Navbar onNavigate={navigateTo} theme={theme} onToggleTheme={toggleTheme} />
