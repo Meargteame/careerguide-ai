@@ -199,7 +199,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
       <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         
         {/* Mobile Header (Only visible on small screens) */}
-        <header className="lg:hidden h-16 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 sticky top-0 z-30">
+        <header className="lg:hidden h-20 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-slate-500 hover:text-slate-800 dark:hover:text-white">
               <Menu size={24} />
@@ -214,7 +214,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
         </header>
 
         {/* Desktop Header */}
-        <header className="hidden lg:flex h-16 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 items-center justify-between px-8 sticky top-0 z-30">
+        <header className="hidden lg:flex h-20 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 items-center justify-between px-8 sticky top-0 z-30">
           <h1 className="font-display font-bold text-2xl text-slate-800 dark:text-white">
             {menuItems.find(i => i.id === activeTab)?.label}
           </h1>
