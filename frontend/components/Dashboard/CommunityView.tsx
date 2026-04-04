@@ -1,33 +1,242 @@
+import React, { useState, useEffect } from 'react';
+import { MessageSquare, ThumbsUp, Heart, Smile, PartyPopper, Share2, Plus, Users, Hash, X, Send, ArrowLeft, Loader2 } from 'lucide-react';
+import { supabase } from '../../services/supabaseClient';
 
-import React, { useState } from 'react';
-import { MessageSquare, ThumbsUp, Share2, Plus, Users, Hash, X, Send } from 'lucide-react';
+const EMOJIS = [
+  { id: 'likes', icon: ThumbsUp, color: 'text-blue-500' },
+  { id: 'love', icon: Heart, color: 'text-rose-500' },
+  { id: 'laugh', icon: Smile, color: 'text-amber-500' },
+  { id: 'celebrate', icon: PartyPopper, color: 'text-emerald-500' }
+];
+
+const getLocalUsername = () => {
+  let user = localStorage.getItem('community_user');
+  if (!user) {
+    user = 'Dev' + Math.floor(Math.random() * 10000);
+    localStorage.setItem('community_user', user);
+  }
+  return user;
+};
 
 const CommunityView: React.FC = () => {
+  const [threads, setThreads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeThread, setActiveThread] = useState<any>(null);
+  const [replies, setReplies] = useState<any[]>([]);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
-  const [newTag, setNewTag] = useState('Academics'); // Default value matches options
+  const [newContent, setNewContent] = useState('');
+  const [newTag, setNewTag] = useState('Academics');
+  const [replyText, setReplyText] = useState('');
   
-  const [threads, setThreads] = useState([
-    { user: "Alex B.", time: "2h ago", title: "Any tips for the Advanced Level Compiler Design project?", likes: 24, replies: 12, tag: "Academics" },
-    { user: "Sarah K.", time: "5h ago", title: "Looking for a backend partner for the SaaS Hackathon!", likes: 45, replies: 8, tag: "Collaboration" },
-    { user: "David M.", time: "1d ago", title: "How to properly set up Docker on Windows for Enterprise ISP constraints?", likes: 112, replies: 56, tag: "DevOps" },
-    { user: "Hannah T.", time: "2d ago", title: "CareerPath AI helped me land an internship at Top Tech Companies!", likes: 890, replies: 122, tag: "Success" },
-  ]);
+  const myUser = getLocalUsername();
 
-  const handlePost = () => {
-    if (!newTitle.trim()) return;
-    const newThread = {
-      user: "Me (You)",
-      time: "Just now",
-      title: newTitle,
-      likes: 0,
-      replies: 0,
-      tag: newTag
-    };
-    setThreads([newThread, ...threads]); // Prepend new thread
-    setNewTitle('');
-    setIsModalOpen(false);
+  const fetchThreads = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('community_threads')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (!error && data) {
+        setThreads(data);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const fetchReplies = async (threadId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('community_replies')
+        .select('*')
+        .eq('thread_id', threadId)
+        .order('created_at', { ascending: true });
+        
+      if (!error && data) {
+        setReplies(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchThreads();
+    
+    // Subscribe to threads
+    const threadsChannel = supabase.channel('public:community_threads')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_threads' }, payload => {
+        fetchThreads();
+        if (payload.new && activeThread && payload.new.id === activeThread.id) {
+          setActiveThread(payload.new);
+        }
+      })
+      .subscribe();
+
+    // Subscribe to replies
+    const repliesChannel = supabase.channel('public:community_replies')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'community_replies' }, payload => {
+        if (activeThread && (payload.new?.thread_id === activeThread.id || payload.old?.thread_id === activeThread.id)) {
+          fetchReplies(activeThread.id);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(threadsChannel);
+      supabase.removeChannel(repliesChannel);
+    };
+  }, [activeThread?.id]);
+
+  const handlePost = async () => {
+    if (!newTitle.trim()) return;
+    
+    setIsModalOpen(false);
+    const { error } = await supabase.from('community_threads').insert([{
+      user_name: myUser,
+      avatar_text: myUser.substring(0, 2).toUpperCase(),
+      title: newTitle,
+      content: newContent,
+      category: newTag
+    }]);
+
+    if (error) {
+      alert("Failed to post. Have you run the community SQL migration?");
+    }
+    
+    setNewTitle('');
+    setNewContent('');
+  };
+
+  const handleReply = async () => {
+    if (!replyText.trim() || !activeThread) return;
+    
+    const { error } = await supabase.from('community_replies').insert([{
+      thread_id: activeThread.id,
+      user_name: myUser,
+      avatar_text: myUser.substring(0, 2).toUpperCase(),
+      content: replyText
+    }]);
+
+    if (!error) {
+      setReplyText('');
+    }
+  };
+
+  const handleReaction = async (threadId: string, reaction: string, currentValue: number) => {
+    await supabase.from('community_threads')
+      .update({ [reaction]: currentValue + 1 })
+      .eq('id', threadId);
+  };
+  
+  const handleReplyReaction = async (replyId: string, currentValue: number) => {
+    await supabase.from('community_replies')
+      .update({ likes: currentValue + 1 })
+      .eq('id', replyId);
+  };
+
+  if (activeThread) {
+    return (
+      <div className="animate-reveal space-y-8 pb-20">
+        <button 
+          onClick={() => setActiveThread(null)}
+          className="flex items-center gap-2 text-slate-500 hover:text-emerald-500 font-bold uppercase tracking-widest text-sm transition-colors group"
+        >
+          <ArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Back to Tavern
+        </button>
+
+        <div className="bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 md:p-10 mb-10">
+          <div className="flex flex-col md:flex-row gap-6 mb-8">
+            <div className="w-16 h-16 shrink-0 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center font-black text-xl shadow-inner uppercase">
+              {activeThread.avatar_text || activeThread.user_name?.charAt(0)}
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-400 mb-1">
+                {activeThread.user_name} • {new Date(activeThread.created_at).toLocaleDateString()}
+              </p>
+              <h2 className="text-3xl font-black text-slate-800 dark:text-white leading-tight mb-4">{activeThread.title}</h2>
+              <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">{activeThread.content}</p>
+              
+              <div className="flex flex-wrap gap-4">
+                {EMOJIS.map(emoji => (
+                  <button 
+                    key={emoji.id}
+                    onClick={() => handleReaction(activeThread.id, emoji.id, activeThread[emoji.id] || 0)}
+                    className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors font-bold group"
+                  >
+                    <emoji.icon size={18} className={`group-hover:${emoji.color} group-hover:scale-110 transition-all`} /> 
+                    {activeThread[emoji.id] || 0}
+                  </button>
+                ))}
+                <button className="flex items-center gap-2 ml-auto text-blue-500 font-bold hover:bg-blue-50 dark:hover:bg-blue-500/20 px-4 py-2 rounded-xl transition-colors">
+                  <Share2 size={18} /> Share
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Replies Section */}
+          <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-800 pt-10">
+            <h3 className="text-xl font-black text-slate-800 dark:text-white mb-6 uppercase tracking-widest text-sm flex items-center gap-3">
+              <MessageSquare size={18} className="text-emerald-500" />
+              {replies.length} Replies
+            </h3>
+            
+            <div className="space-y-6 mb-10">
+              {replies.map(reply => (
+                <div key={reply.id} className="flex gap-4 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border-2 border-slate-100 dark:border-slate-800">
+                  <div className="w-12 h-12 shrink-0 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-xl flex items-center justify-center font-black shadow-inner uppercase">
+                   {reply.avatar_text || reply.user_name?.charAt(0)}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-bold text-slate-400 mb-2">{reply.user_name} • {new Date(reply.created_at).toLocaleDateString()}</p>
+                    <p className="text-slate-700 dark:text-slate-200 mb-4">{reply.content}</p>
+                    <button 
+                      onClick={() => handleReplyReaction(reply.id, reply.likes || 0)}
+                      className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-blue-500"
+                    >
+                      <ThumbsUp size={14} /> {reply.likes || 0}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {replies.length === 0 && (
+                <p className="text-slate-500 dark:text-slate-400 font-bold bg-slate-50 dark:bg-slate-800/30 p-6 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 text-center">
+                  No replies yet. Be the first to share your wisdom!
+                </p>
+              )}
+            </div>
+
+            {/* Post Reply */}
+            <div className="flex gap-4">
+              <textarea 
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Write your reply..."
+                className="flex-1 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 font-medium text-slate-700 dark:text-white outline-none focus:border-emerald-400 focus:bg-white resize-none h-32"
+              />
+              <button 
+                onClick={handleReply}
+                disabled={!replyText.trim()}
+                className="flex-none bg-emerald-500 text-white rounded-2xl px-8 font-black uppercase tracking-widest text-[12px] shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none transition-all disabled:opacity-50 disabled:pointer-events-none group"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  <span>Send</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-reveal space-y-12 relative pb-20">
@@ -40,87 +249,47 @@ const CommunityView: React.FC = () => {
           onClick={() => setIsModalOpen(true)}
           className="w-full md:w-auto px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[12px] transition-all bg-emerald-500 text-white shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none flex items-center justify-center gap-2 group"
         >
-          <Plus size={18} strokeWidth={3} className="group-hover:rotate-90 transition-transform" /> Start Quest
+          <Plus size={18} strokeWidth={3} className="group-hover:rotate-90 transition-transform" /> Ask The Guild
         </button>
       </header>
 
+      {/* Create Modal */}
       {isModalOpen && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 pointer-events-none">
-          <div className="pointer-events-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl w-full rounded-[2rem] border border-slate-200/80 dark:border-slate-700/80 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.25)] dark:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)] animate-in slide-in-from-top-4 zoom-in-95 duration-300 overflow-hidden">
-            
-            {/* Accent top bar */}
-            <div className="h-1 w-full bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400" />
-
+          <div className="pointer-events-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl w-full rounded-[2rem] border border-slate-200/80 dark:border-slate-700/80 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.25)] dark:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)] animate-in slide-in-from-top-4 overflow-hidden">
+            <div className="h-2 w-full bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400" />
             <div className="p-8">
-              {/* Header */}
-              <div className="flex justify-between items-start mb-7">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-inner">
-                    <Send size={20} strokeWidth={2.5} />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-0.5">Community Board</p>
-                    <h3 className="text-xl font-display font-black text-slate-800 dark:text-white tracking-tight">New Post</h3>
-                  </div>
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                    <h3 className="text-xl font-display font-black text-slate-800 dark:text-white uppercase tracking-wider">Start A Quest</h3>
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:rotate-90 transition-all duration-200"
+                  className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:rotate-90 transition-all"
                 >
-                  <X size={18} strokeWidth={2.5} />
+                  <X size={18} strokeWidth={3} />
                 </button>
               </div>
 
               <div className="space-y-4">
-                {/* Category pills */}
-                <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Category</p>
-                  <div className="flex flex-wrap gap-2">
-                    {['Academics', 'Collaboration', 'DevOps', 'Career', 'General'].map(tag => (
-                      <button
-                        key={tag}
-                        onClick={() => setNewTag(tag)}
-                        className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all border-2 ${
-                          newTag === tag
-                            ? 'bg-emerald-500 text-white border-emerald-600 shadow-[0_4px_0_rgba(16,185,129,0.4)] -translate-y-0.5'
-                            : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-emerald-300 hover:text-emerald-600'
-                        }`}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Message input */}
-                <div className="relative">
-                  <textarea
+                <input
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    placeholder="What knowledge do you seek?"
-                    rows={4}
-                    className="w-full bg-slate-50 dark:bg-slate-800/80 border-2 border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-4 font-medium text-slate-700 dark:text-white outline-none focus:border-emerald-400 dark:focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 resize-none transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600 text-sm leading-relaxed"
-                  />
-                  <span className="absolute bottom-3 right-4 text-[10px] font-bold text-slate-300 dark:text-slate-600">
-                    {newTitle.length} chars
-                  </span>
-                </div>
+                    placeholder="Short Title / Summary"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-400"
+                />
+                
+                <textarea
+                  value={newContent}
+                  onChange={(e) => setNewContent(e.target.value)}
+                  placeholder="Elaborate on your question or quest..."
+                  rows={4}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-medium text-slate-700 dark:text-white outline-none focus:border-emerald-400 resize-none h-32"
+                />
 
-                {/* Actions */}
-                <div className="flex gap-3 pt-1">
-                  <button
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-1 py-3.5 rounded-xl font-black uppercase tracking-widest text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border-2 border-transparent"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handlePost}
-                    disabled={!newTitle.trim()}
-                    className="flex-[2] py-3.5 rounded-xl font-black uppercase tracking-widest text-[11px] bg-emerald-500 text-white shadow-[0_4px_0_rgba(16,185,129,0.6)] hover:translate-y-[2px] hover:shadow-[0_2px_0_rgba(16,185,129,0.6)] active:translate-y-[4px] active:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:transform-none disabled:shadow-[0_4px_0_rgba(16,185,129,0.6)]"
-                  >
-                    <Send size={14} strokeWidth={3} /> Post to Board
-                  </button>
+                <div className="flex gap-2">
+                  <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold uppercase tracking-widest text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-500">Cancel</button>
+                  <button onClick={handlePost} disabled={!newTitle.trim()} className="flex-[2] py-3 rounded-xl font-black uppercase tracking-widest text-[11px] bg-emerald-500 text-white shadow-[0_4px_0_rgba(16,185,129,0.6)] disabled:opacity-50">Post to Board</button>
                 </div>
               </div>
             </div>
@@ -128,82 +297,61 @@ const CommunityView: React.FC = () => {
         </div>
       )}
 
-      <div className="grid lg:grid-cols-4 gap-12">
-        <div className="lg:col-span-3 space-y-6">
-          {threads.map((thread, i) => (
-            <div key={i} className="bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 hover:-translate-y-2 hover:shadow-[0_12px_0_rgba(226,232,240,1)] transition-all cursor-pointer group flex flex-col sm:flex-row gap-6">
-              
-              {/* Avatar Column */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+           <Loader2 className="w-10 h-10 animate-spin mb-4 text-emerald-500" />
+           <p className="font-bold uppercase tracking-widest text-sm">Syncing with Real-Time Server...</p>
+        </div>
+      ) : threads.length === 0 ? (
+        <div className="text-center py-20 border-4 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
+           <Users size={48} className="mx-auto text-slate-300 dark:text-slate-700 mb-4" />
+           <h2 className="text-2xl font-black text-slate-700 dark:text-slate-300">Quiet Tavern</h2>
+           <p className="text-slate-500 font-bold mt-2">No threads exist yet. Run the SQL migration and start a quest!</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {threads.map((thread) => (
+            <div 
+              key={thread.id} 
+              onClick={() => { setActiveThread(thread); fetchReplies(thread.id); }}
+              className="bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 hover:-translate-y-2 hover:shadow-[0_12px_0_rgba(226,232,240,1)] transition-all cursor-pointer group flex flex-col sm:flex-row gap-6"
+            >
               <div className="flex flex-col items-center gap-3 shrink-0">
                 <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-[1.25rem] border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center font-black text-slate-700 dark:text-slate-300 text-lg uppercase group-hover:bg-emerald-100 group-hover:text-emerald-600 group-hover:border-emerald-200 transition-colors shadow-sm">
-                  {thread.user.split(' ').map(n => n[0]).join('')}
-                </div>
-                <div className="flex flex-col items-center">
-                   <div className="flex items-center gap-1 text-slate-400 font-bold hover:text-emerald-500 cursor-pointer p-1 rounded-lg transition-colors">
-                     <ThumbsUp size={16} strokeWidth={3} className="group-hover:-rotate-12 transition-transform" /> 
-                   </div>
-                   <span className="text-[11px] font-black text-slate-500 mt-1">{thread.likes}</span>
+                  {thread.avatar_text || thread.user_name?.charAt(0)}
                 </div>
               </div>
-
-              {/* Content Column */}
               <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <span className="font-bold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-lg text-sm border-2 border-slate-100 dark:border-slate-700">{thread.user}</span>
-                  <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{thread.time}</span>
-                  <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border-2 border-blue-100 shadow-sm ml-auto sm:ml-0">{thread.tag}</span>
+                <div className="flex flex-wrap items-center gap-3 mb-2">
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 text-[11px] font-black uppercase tracking-widest rounded-lg flex items-center gap-1">
+                    <Hash size={12} /> {thread.category}
+                  </span>
+                  <span className="text-xs font-bold text-slate-400">{thread.user_name} • {new Date(thread.created_at).toLocaleDateString()}</span>
                 </div>
-                
-                <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white mb-6 leading-tight group-hover:text-emerald-600 transition-colors line-clamp-2 md:line-clamp-none">
+                <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2 leading-tight group-hover:text-emerald-500 transition-colors truncate">
                   {thread.title}
                 </h3>
-                
-                <div className="flex items-center gap-4">
-                  <button className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 font-bold text-sm bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl transition-all border-2 border-slate-200 dark:border-slate-700 hover:border-emerald-200 hover:bg-emerald-50 shadow-sm">
-                    <MessageSquare size={16} strokeWidth={2.5} /> {thread.replies} Replies
-                  </button>
-                  <button className="flex items-center justify-center w-10 h-10 rounded-xl text-slate-400 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm">
-                    <Share2 size={16} strokeWidth={2.5} />
-                  </button>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-1 mb-4">{thread.content}</p>
+                <div className="flex flex-wrap gap-4 pt-4 border-t-2 border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-1.5 text-sm font-bold text-slate-500">
+                    <MessageSquare size={16} /> {thread.replies_count || 0} Replies
+                  </div>
+                  <div className="flex gap-3 text-slate-400">
+                     {activeThread?.id === thread.id ? null : (
+                       <>
+                         <div className="flex items-center gap-1"><ThumbsUp size={14}/> {thread.likes || 0}</div>
+                         <div className="flex items-center gap-1"><Heart size={14}/> {thread.love || 0}</div>
+                         <div className="flex items-center gap-1"><Smile size={14}/> {thread.laugh || 0}</div>
+                         <div className="flex items-center gap-1"><PartyPopper size={14}/> {thread.celebrate || 0}</div>
+                       </>
+                     )}
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
-
-        <div className="space-y-8">
-          {/* Tags Box */}
-          <div className="bg-slate-50 dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-none">
-            <h4 className="text-xl font-display font-black text-slate-800 dark:text-white uppercase tracking-wider mb-6 flex items-center gap-3">
-              <Hash size={24} className="text-blue-500" strokeWidth={3} /> Trending
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {['#ReactJS', '#Tech2024', '#Internships', '#GoLang', '#GlobalTech', '#Enterprise', '#Hackathon'].map((tag) => (
-                <button key={tag} className="bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 px-4 py-2.5 rounded-xl text-[11px] font-black text-slate-500 uppercase tracking-widest hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm hover:shadow-[0_4px_0_rgba(191,219,254,1)] hover:-translate-y-1 active:translate-y-0 active:shadow-none">
-                  {tag}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Mentors Card */}
-          <div className="bg-amber-400 dark:bg-amber-500 border-4 border-amber-500 dark:border-amber-600 text-slate-900 p-8 rounded-[2.5rem] shadow-[0_8px_0_rgba(217,119,6,1)] relative overflow-hidden group hover:-translate-y-1 transition-transform">
-            <div className="absolute top-[-20%] right-[-20%] w-48 h-48 bg-white/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
-            <div className="relative z-10 text-center">
-              <div className="w-20 h-20 bg-white/20 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 backdrop-blur-sm border-2 border-white/40 shadow-inner group-hover:rotate-6 transition-transform">
-                 <Users size={36} className="text-slate-900" strokeWidth={2.5} />
-              </div>
-              <h4 className="text-3xl font-display font-black mb-3 tracking-wide drop-shadow-sm uppercase">Pro Mentors</h4>
-              <p className="text-slate-800/80 text-sm font-bold leading-relaxed mb-8">
-                Join the elite alumni network and get direct guidance from industry pros.
-              </p>
-              <button className="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-widest text-[12px] hover:bg-slate-800 transition-all shadow-[0_4px_0_rgba(0,0,0,0.5)] active:translate-y-[4px] active:shadow-none">
-                Apply to Mentor
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
