@@ -70,7 +70,7 @@ const CommunityView: React.FC = () => {
     fetchThreads();
     
     // Subscribe to threads
-    const threadsChannel = supabase.channel('public:community_threads')
+    const threadsChannel = supabase.channel('custom-all-threads')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'community_threads' }, payload => {
         fetchThreads();
         if (payload.new && activeThread && payload.new.id === activeThread.id) {
@@ -80,7 +80,7 @@ const CommunityView: React.FC = () => {
       .subscribe();
 
     // Subscribe to replies
-    const repliesChannel = supabase.channel('public:community_replies')
+    const repliesChannel = supabase.channel('custom-all-replies')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'community_replies' }, payload => {
         if (activeThread && (payload.new?.thread_id === activeThread.id || payload.old?.thread_id === activeThread.id)) {
           fetchReplies(activeThread.id);
@@ -112,10 +112,14 @@ const CommunityView: React.FC = () => {
     
     setNewTitle('');
     setNewContent('');
+    fetchThreads();
   };
 
   const handleReply = async () => {
     if (!replyText.trim() || !activeThread) return;
+    
+    // Increment the activeThread locally for snappy UI
+    setActiveThread((prev: any) => ({ ...prev, replies_count: (prev.replies_count || 0) + 1 }));
     
     const { error } = await supabase.from('community_replies').insert([{
       thread_id: activeThread.id,
@@ -126,16 +130,37 @@ const CommunityView: React.FC = () => {
 
     if (!error) {
       setReplyText('');
+      fetchReplies(activeThread.id);
+      
+      // Update thread reply count
+      await supabase.from('community_threads').update({
+        replies_count: (activeThread.replies_count || 0) + 1
+      }).eq('id', activeThread.id);
+      
+      fetchThreads();
     }
   };
 
   const handleReaction = async (threadId: string, reaction: string, currentValue: number) => {
+    // Optimistic Update
+    setThreads(currentThreads => currentThreads.map(t => 
+      t.id === threadId ? { ...t, [reaction]: currentValue + 1 } : t
+    ));
+    if (activeThread && activeThread.id === threadId) {
+      setActiveThread((prev: any) => ({ ...prev, [reaction]: currentValue + 1 }));
+    }
+
     await supabase.from('community_threads')
       .update({ [reaction]: currentValue + 1 })
       .eq('id', threadId);
   };
   
   const handleReplyReaction = async (replyId: string, currentValue: number) => {
+    // Optimistic Update
+    setReplies(currentReplies => currentReplies.map(r => 
+      r.id === replyId ? { ...r, likes: currentValue + 1 } : r
+    ));
+
     await supabase.from('community_replies')
       .update({ likes: currentValue + 1 })
       .eq('id', replyId);
@@ -245,57 +270,57 @@ const CommunityView: React.FC = () => {
           <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">Tavern</p>
           <h1 className="text-4xl md:text-5xl font-display font-black text-slate-800 dark:text-white uppercase tracking-widest leading-none drop-shadow-sm">Community</h1>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="w-full md:w-auto px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[12px] transition-all bg-emerald-500 text-white shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none flex items-center justify-center gap-2 group"
-        >
-          <Plus size={18} strokeWidth={3} className="group-hover:rotate-90 transition-transform" /> Ask The Guild
-        </button>
       </header>
 
-      {/* Create Modal */}
-      {isModalOpen && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 pointer-events-none">
-          <div className="pointer-events-auto bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl w-full rounded-[2rem] border border-slate-200/80 dark:border-slate-700/80 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.25)] dark:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)] animate-in slide-in-from-top-4 overflow-hidden">
-            <div className="h-2 w-full bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400" />
-            <div className="p-8">
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                    <h3 className="text-xl font-display font-black text-slate-800 dark:text-white uppercase tracking-wider">Start A Quest</h3>
-                </div>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-rose-500 hover:rotate-90 transition-all"
-                >
-                  <X size={18} strokeWidth={3} />
-                </button>
+      {/* Inline Post Composer */}
+      <div className="bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-6 sm:p-8 flex flex-col gap-4 shadow-sm relative overflow-hidden transition-all focus-within:border-emerald-400 focus-within:shadow-[0_12px_0_rgba(16,185,129,0.2)]">
+        <div className="flex gap-4">
+          <div className="w-12 h-12 shrink-0 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center font-black shadow-inner uppercase text-lg">
+            {myUser.substring(0, 2)}
+          </div>
+          <div className="flex-1 space-y-3">
+            <input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="What knowledge do you seek? (Short Title)"
+              className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-400 transition-colors"
+            />
+            {newTitle.length > 0 && (
+              <textarea
+                value={newContent}
+                onChange={(e) => setNewContent(e.target.value)}
+                placeholder="Elaborate on your question, quest, or project..."
+                rows={3}
+                className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-medium text-slate-700 dark:text-white outline-none focus:border-emerald-400 resize-none animate-in fade-in slide-in-from-top-2 duration-200"
+              />
+            )}
+            <div className={`flex flex-wrap items-center justify-between gap-4 pt-2 transition-all duration-300 ${newTitle.length > 0 ? 'opacity-100 h-auto' : 'opacity-50 h-10'}`}>
+              <div className="flex gap-2 overflow-x-auto">
+                {['Academics', 'Collaboration', 'DevOps', 'Career'].map(tag => (
+                   <button
+                     key={tag}
+                     onClick={() => setNewTag(tag)}
+                     className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border-2 whitespace-nowrap ${
+                       newTag === tag
+                         ? 'bg-emerald-500 text-white border-emerald-600'
+                         : 'bg-slate-50 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-emerald-300'
+                     }`}
+                   >
+                     {tag}
+                   </button>
+                ))}
               </div>
-
-              <div className="space-y-4">
-                <input
-                    value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
-                    placeholder="Short Title / Summary"
-                    className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-bold text-slate-700 dark:text-white outline-none focus:border-emerald-400"
-                />
-                
-                <textarea
-                  value={newContent}
-                  onChange={(e) => setNewContent(e.target.value)}
-                  placeholder="Elaborate on your question or quest..."
-                  rows={4}
-                  className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 font-medium text-slate-700 dark:text-white outline-none focus:border-emerald-400 resize-none h-32"
-                />
-
-                <div className="flex gap-2">
-                  <button onClick={() => setIsModalOpen(false)} className="flex-1 py-3 rounded-xl font-bold uppercase tracking-widest text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-500">Cancel</button>
-                  <button onClick={handlePost} disabled={!newTitle.trim()} className="flex-[2] py-3 rounded-xl font-black uppercase tracking-widest text-[11px] bg-emerald-500 text-white shadow-[0_4px_0_rgba(16,185,129,0.6)] disabled:opacity-50">Post to Board</button>
-                </div>
-              </div>
+              <button 
+                onClick={handlePost} 
+                disabled={!newTitle.trim()} 
+                className="px-6 py-3 rounded-xl font-black uppercase tracking-widest text-[12px] bg-emerald-500 text-white shadow-[0_4px_0_rgba(16,185,129,0.6)] hover:translate-y-[2px] hover:shadow-[0_2px_0_rgba(16,185,129,0.6)] active:translate-y-[4px] active:shadow-none transition-all disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2 shrink-0 group"
+              >
+                <Send size={16} strokeWidth={3} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> Post Quest
+              </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
