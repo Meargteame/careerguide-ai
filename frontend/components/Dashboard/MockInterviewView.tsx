@@ -115,7 +115,7 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
 
         {/* Configuration Panel */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="col-span-2 bg-white dark:bg-slate-950 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden">
+          <div className="col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg relative overflow-hidden rounded-[2rem] p-8">
             <div className="space-y-6 relative z-10">
               <div>
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">
@@ -126,7 +126,7 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
                   <input
                     type="text"
                     placeholder="e.g., Senior Full-Stack Engineer, Product Manager..."
-                    className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all dark:text-white placeholder:text-slate-500 font-medium text-lg"
+                    className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all dark:text-white placeholder:text-slate-400 text-base"
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                   />
@@ -135,7 +135,7 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider flex items-center gap-2">
                     Difficulty Level
                   </label>
                   <div className="flex flex-col gap-2">
@@ -143,20 +143,21 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
                       <button
                         key={level}
                         onClick={() => setDifficulty(level)}
-                        className={`py-3 px-4 rounded-xl border-2 transition-all font-bold text-left ${
+                        className={`py-3 px-4 rounded-xl border transition-all font-bold text-left flex items-center justify-between ${
                           difficulty === level 
-                            ? 'border-blue-500 bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)] dark:border-blue-600 dark:bg-blue-600'
-                            : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700'
+                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-500/50 dark:bg-blue-500/10 dark:text-blue-300'
+                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700'
                         }`}
                       >
                         {level}
+                        {difficulty === level && <CheckCircle2 className="w-4 h-4" />}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider flex items-center gap-2">
                     Focus Area
                   </label>
                   <div className="flex flex-col gap-2">
@@ -164,10 +165,10 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
                       <button
                         key={focus}
                         onClick={() => setFocusArea(focus)}
-                        className={`py-3 px-4 rounded-xl border-2 transition-all font-bold text-left flex items-center justify-between ${
+                        className={`py-3 px-4 rounded-xl border transition-all font-bold text-left flex items-center justify-between ${
                           focusArea === focus 
                             ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-500/50 dark:bg-indigo-500/10 dark:text-indigo-300'
-                            : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-200 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700'
+                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700'
                         }`}
                       >
                         {focus}
@@ -182,12 +183,12 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
                 <button
                   onClick={startInterview}
                   disabled={!role.trim() || isGenerating}
-                  className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-bold text-lg flex justify-center items-center gap-3 transition-all transform hover:scale-[1.02] shadow-[0_10px_20px_rgba(37,99,235,0.3)]"
+                  className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-lg hover:bg-slate-800 dark:hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 transition-all shadow-lg shadow-slate-900/20"
                 >
                   {isGenerating ? (
-                    <><Activity className="w-6 h-6 animate-pulse" /> Establishing AI Connection...</>
+                    <><Activity className="w-5 h-5 animate-pulse" /> Evaluating Matrix...</>
                   ) : (
-                    <><Play className="w-6 h-6 fill-white" /> Initialize Virtual Interview</>
+                    <><Play className="w-5 h-5" /> Initialize Virtual Interview</>
                   )}
                 </button>
               </div>
