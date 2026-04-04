@@ -160,6 +160,14 @@ const LibraryView: React.FC<LibraryViewProps> = ({ userId }) => {
                   </p>
                 </div>
                 
+                <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 mb-6 overflow-hidden border border-slate-200 dark:border-slate-700">
+                  <div className="bg-gradient-to-r from-emerald-400 to-emerald-500 h-3 rounded-full transition-all duration-500" style={{ width: `${course.progress || 0}%` }}></div>
+                </div>
+                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">
+                  <span>Progress</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-800">{course.progress || 0}%</span>
+                </div>
+                
                 <div className="flex items-center gap-4 text-sm font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 border-t-4 border-slate-100 dark:border-slate-800/50 pt-6 mt-6">
                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-xl">
                       <Clock size={16} className="text-slate-400" /> {course.duration}
