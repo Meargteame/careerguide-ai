@@ -442,11 +442,14 @@ export const generateLessonContent = async (lessonTitle: string, moduleTitle: st
 export const generateInterviewQuestions = async (role: string, difficulty: 'Beginner' | 'Intermediate' | 'Advanced'): Promise<string[]> => {
   const prompt = `You are an expert technical interviewer hiring for a ${role} role. 
   Generate 3 strict, technical interview questions appropriate for a ${difficulty} level candidate.
+  To ensure a realistic and unique experience, generate completely random and diverse questions each time. Pull from obscure but practical use cases, advanced edge cases, or highly specific scenarios related to ${role}. 
+  Do NOT repeat standard textbook questions. Vary the topics (e.g., architecture, debugging, syntax, system design).
+  Include a random seed factor: ${Date.now() + Math.random()} to enforce variety.
   Return ONLY a raw JSON array of strings containing the questions.
   Example: ["question 1", "question 2", "question 3"]`;
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-8b" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
     const result = await model.generateContent(prompt);
     const jsonStr = extractJsonFromResponse(result);
     return JSON.parse(jsonStr);
@@ -489,7 +492,7 @@ export const evaluateInterviewAnswer = async (
   }`;
 
   try {
-    const model = getGenAI().getGenerativeModel({ model: "gemini-1.5-flash-8b" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
     const result = await model.generateContent(prompt);
     const jsonStr = extractJsonFromResponse(result);
     return JSON.parse(jsonStr);
