@@ -456,22 +456,36 @@ export const generateInterviewQuestions = async (role: string, difficulty: 'Begi
   }
 };
 
+export interface EvaluationMatrix {
+  score: number;
+  clarity: number;
+  technicalAccuracy: number;
+  completeness: number;
+  feedback: string;
+  modelAnswer: string;
+  keyMissedPoints: string[];
+}
+
 export const evaluateInterviewAnswer = async (
   role: string, 
   question: string, 
   answer: string
-): Promise<{ score: number; feedback: string; modelAnswer: string }> => {
+): Promise<EvaluationMatrix> => {
   const prompt = `You are a strict technical interviewer evaluating a candidate for a ${role} role.
   Question asked: "${question}"
   Candidate's answer: "${answer}"
   
-  Evaluate the answer out of 10. Give critical feedback on what they missed or got right, and provide a short, ideal model answer.
+  Evaluate the answer out of 10. Give critical feedback. Assess 3 core metrics out of 10: Clarity, Technical Accuracy, and Completeness.
   
   Return ONLY a JSON object with this exact structure:
   {
-    "score": <number between 0 and 10>,
-    "feedback": "<string: concise feedback>",
-    "modelAnswer": "<string: the ideal answer to the question>"
+    "score": <number 0-10, overall>,
+    "clarity": <number 0-10>,
+    "technicalAccuracy": <number 0-10>,
+    "completeness": <number 0-10>,
+    "feedback": "<string: concise critical feedback>",
+    "modelAnswer": "<string: the ideal short answer>",
+    "keyMissedPoints": ["point 1", "point 2"]
   }`;
 
   try {
@@ -483,8 +497,12 @@ export const evaluateInterviewAnswer = async (
     console.error('Error evaluating interview answer:', error);
     return {
       score: 5,
+      clarity: 5,
+      technicalAccuracy: 5,
+      completeness: 5,
       feedback: "Failed to evaluate answer properly due to AI error.",
-      modelAnswer: "No ideal answer could be generated right now."
+      modelAnswer: "No ideal answer could be generated right now.",
+      keyMissedPoints: []
     };
   }
 };
