@@ -95,19 +95,19 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
     return (
       <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
         {/* Header Hero */}
-        <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 p-8 md:p-12 border border-slate-800 shadow-2xl">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-blue-600 p-8 md:p-12 border-4 border-blue-700 shadow-[0_8px_0_rgba(29,78,216,1)] text-white">
           <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-20">
-             <Cpu className="w-96 h-96 text-blue-500" />
+             <Cpu className="w-96 h-96 text-blue-300" />
           </div>
           <div className="relative z-10 space-y-4 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/20 text-blue-300 text-sm font-bold border border-blue-500/30">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-900/30 text-white text-[10px] uppercase font-black tracking-widest border border-white/10">
               <Bot className="w-4 h-4" /> AI MOCK INTERVIEW ENGINE
             </div>
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-white tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-display font-black text-white tracking-tight">
               Master Your Next <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Technical Interview.</span>
+              <span className="text-blue-100">Technical Interview.</span>
             </h1>
-            <p className="text-slate-300 text-lg leading-relaxed">
+            <p className="text-blue-50 text-lg font-bold leading-relaxed max-w-xl">
               Sit in the hot seat. Answer randomly generated, role-specific questions and get instant, detailed feedback on your clarity, accuracy, and completeness using our advanced Meridian AI.
             </p>
           </div>
@@ -115,18 +115,18 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
 
         {/* Configuration Panel */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-lg relative overflow-hidden rounded-[2rem] p-8">
+          <div className="col-span-2 bg-white dark:bg-slate-900 border-4 border-slate-200 dark:border-slate-800 shadow-[0_8px_0_rgba(226,232,240,1)] dark:shadow-[0_8px_0_rgba(15,23,42,1)] relative overflow-hidden rounded-[2.5rem] p-8">
             <div className="space-y-6 relative z-10">
               <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">
+                <label className="block text-[12px] font-black text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest">
                   Select Target Role
                 </label>
                 <div className="relative">
-                  <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <Terminal className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400" />
                   <input
                     type="text"
                     placeholder="e.g., Senior Full-Stack Engineer, Product Manager..."
-                    className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all dark:text-white placeholder:text-slate-400 text-base"
+                    className="w-full pl-14 pr-4 py-5 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-blue-500 focus:bg-blue-50 focus:ring-0 outline-none transition-all dark:text-white placeholder:text-slate-400 text-lg font-bold shadow-inner"
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                   />
@@ -135,67 +135,67 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider flex items-center gap-2">
+                  <label className="block text-[12px] font-black text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest flex items-center gap-2">
                     Difficulty Level
                   </label>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     {(['Beginner', 'Intermediate', 'Advanced'] as const).map(level => (
                       <button
                         key={level}
                         onClick={() => setDifficulty(level)}
-                        className={`py-3 px-4 rounded-xl border transition-all font-bold text-left flex items-center justify-between ${
+                        className={`py-4 px-5 rounded-2xl border-2 transition-all font-black text-[14px] uppercase tracking-wide text-left flex items-center justify-between ${
                           difficulty === level 
-                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-500/50 dark:bg-blue-500/10 dark:text-blue-300'
-                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700'
+                            ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-[0_4px_0_rgba(59,130,246,1)] dark:bg-blue-600 dark:text-white'
+                            : 'border-slate-200 bg-white text-slate-500 shadow-[0_4px_0_rgba(226,232,240,1)] hover:translate-y-[2px] hover:shadow-[0_2px_0_rgba(226,232,240,1)] active:translate-y-[4px] active:shadow-none dark:border-slate-700 dark:bg-slate-800 dark:shadow-[0_4px_0_rgba(51,65,85,1)] dark:text-slate-400'
                         }`}
                       >
                         {level}
-                        {difficulty === level && <CheckCircle2 className="w-4 h-4" />}
+                        {difficulty === level && <CheckCircle2 className="w-5 h-5" />}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider flex items-center gap-2">
+                  <label className="block text-[12px] font-black text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-widest flex items-center gap-2">
                     Focus Area
                   </label>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3">
                     {(['Technical', 'System Design', 'Behavioral'] as const).map(focus => (
                       <button
                         key={focus}
                         onClick={() => setFocusArea(focus)}
-                        className={`py-3 px-4 rounded-xl border transition-all font-bold text-left flex items-center justify-between ${
+                        className={`py-4 px-5 rounded-2xl border-2 transition-all font-black text-[14px] uppercase tracking-wide text-left flex items-center justify-between ${
                           focusArea === focus 
-                            ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-500/50 dark:bg-indigo-500/10 dark:text-indigo-300'
-                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700'
+                            ? 'border-indigo-500 bg-indigo-50 text-indigo-600 shadow-[0_4px_0_rgba(99,102,241,1)] dark:bg-indigo-600 dark:text-white'
+                            : 'border-slate-200 bg-white text-slate-500 shadow-[0_4px_0_rgba(226,232,240,1)] hover:translate-y-[2px] hover:shadow-[0_2px_0_rgba(226,232,240,1)] active:translate-y-[4px] active:shadow-none dark:border-slate-700 dark:bg-slate-800 dark:shadow-[0_4px_0_rgba(51,65,85,1)] dark:text-slate-400'
                         }`}
                       >
                         {focus}
-                        {focusArea === focus && <CheckCircle2 className="w-4 h-4" />}
+                        {focusArea === focus && <CheckCircle2 className="w-5 h-5" />}
                       </button>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4">
+              <div className="pt-6">
                 <button
                   onClick={startInterview}
                   disabled={!role.trim() || isGenerating}
-                  className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold text-lg hover:bg-slate-800 dark:hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-3 transition-all shadow-lg shadow-slate-900/20"
+                  className="w-full py-5 bg-blue-500 border-2 border-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-[14px] shadow-[0_6px_0_rgba(30,58,138,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(30,58,138,1)] active:translate-y-[6px] active:shadow-none transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group/btn"
                 >
                   {isGenerating ? (
-                    <><Activity className="w-5 h-5 animate-pulse" /> Evaluating Matrix...</>
+                    <><Activity className="w-6 h-6 animate-pulse" /> Evaluating Matrix...</>
                   ) : (
-                    <><Play className="w-5 h-5" /> Initialize Virtual Interview</>
+                    <><Play className="w-6 h-6 group-hover/btn:scale-110 transition-transform" /> Initialize Virtual Interview</>
                   )}
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="bg-slate-950 rounded-[2rem] p-6 border border-slate-800 shadow-xl flex flex-col justify-between">
+          <div className="bg-slate-900 rounded-[2.5rem] p-8 border-4 border-slate-800 shadow-[0_8px_0_rgba(15,23,42,1)] flex flex-col justify-between">
              <div className="space-y-4">
                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
                  <Shield className="w-6 h-6 text-blue-400" />
@@ -224,28 +224,28 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
     const avgScore = results.reduce((acc, r) => acc + r.score, 0) / results.length;
     return (
       <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
-        <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-slate-950 p-12 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden">
+        <div className="flex flex-col items-center text-center space-y-6 bg-white dark:bg-slate-900 p-12 rounded-[2.5rem] border-4 border-slate-200 dark:border-slate-800 shadow-[0_8px_0_rgba(226,232,240,1)] dark:shadow-[0_8px_0_rgba(15,23,42,1)] relative overflow-hidden">
           <div className="absolute inset-0 pattern-dots opacity-5 dark:opacity-10 mix-blend-overlay"></div>
           
-          <div className={`inline-flex items-center justify-center p-6 rounded-full ${avgScore >= 7 ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'} animate-bounce-slow shadow-xl ring-8 ring-slate-50 dark:ring-slate-900`}>
+          <div className={`inline-flex items-center justify-center p-6 rounded-full ${avgScore >= 7 ? 'bg-green-100 text-green-600 dark:bg-green-600 dark:text-white' : 'bg-orange-100 text-orange-600 dark:bg-orange-600 dark:text-white'} animate-bounce-slow ring-8 ring-slate-50 dark:ring-slate-800`}>
             <Award className="w-16 h-16" />
           </div>
           
           <div className="relative z-10">
-            <h2 className="text-4xl font-display font-bold text-slate-900 dark:text-white mb-2">Performance Report</h2>
-            <p className="text-xl text-slate-600 dark:text-slate-400">
+            <h2 className="text-4xl font-display font-black text-slate-900 dark:text-white mb-2">Performance Report</h2>
+            <p className="text-xl font-bold text-slate-500 dark:text-slate-400">
               Final Composite Score: <span className={`font-black text-3xl ml-2 ${avgScore >= 7 ? 'text-green-500' : 'text-orange-500'}`}>{avgScore.toFixed(1)} / 10</span>
             </p>
           </div>
 
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent my-4"></div>
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent my-4"></div>
 
           <button 
             onClick={() => {
               setQuestions([]);
               setRole('');
             }}
-            className="px-8 py-4 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-full font-bold transition-all shadow-lg transform hover:-translate-y-1"
+            className="px-10 py-5 bg-blue-500 border-2 border-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-[14px] shadow-[0_6px_0_rgba(30,58,138,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(30,58,138,1)] active:translate-y-[6px] active:shadow-none transition-all flex items-center justify-center gap-3"
           >
             Start New Session
           </button>
@@ -253,9 +253,9 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
 
         <div className="space-y-6">
           {results.map((r, idx) => (
-            <div key={idx} className="bg-white dark:bg-slate-950 rounded-[2rem] p-8 border border-slate-200 dark:border-slate-800 shadow-lg">
+            <div key={idx} className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border-4 border-slate-200 dark:border-slate-800 shadow-[0_8px_0_rgba(226,232,240,1)] dark:shadow-[0_8px_0_rgba(15,23,42,1)]">
               <div className="flex gap-4 items-start mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-blue-500 text-white font-black text-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/30">
+                <div className="w-12 h-12 rounded-xl bg-blue-500 border-2 border-blue-600 text-white font-black text-xl flex items-center justify-center flex-shrink-0 shadow-[0_4px_0_rgba(30,58,138,1)]">
                   Q{idx + 1}
                 </div>
                 <h3 className="font-bold text-xl text-slate-900 dark:text-white pt-2 leading-relaxed">{questions[idx]}</h3>
@@ -409,7 +409,7 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
                 <button
                   onClick={submitAnswer}
                   disabled={!currentAnswer.trim() || isEvaluating}
-                  className="w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-bold text-lg flex justify-center items-center gap-3 transition-transform hover:scale-105 shadow-[0_10px_20px_rgba(37,99,235,0.3)]"
+                  className="w-full sm:w-auto px-10 py-5 bg-blue-500 border-2 border-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl font-black uppercase tracking-widest text-[14px] shadow-[0_6px_0_rgba(30,58,138,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(30,58,138,1)] active:translate-y-[6px] active:shadow-none transition-all flex justify-center items-center gap-3"
                 >
                   {isEvaluating ? (
                     <><Activity className="w-5 h-5 animate-spin" /> Processing Matrix...</>
@@ -455,7 +455,7 @@ export const MockInterviewView: React.FC<MockInterviewViewProps> = ({ userId }) 
               <div className="pt-4">
                 <button
                   onClick={nextQuestion}
-                  className="w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all shadow-lg ring-4 ring-transparent hover:ring-slate-900/10 dark:hover:ring-white/10"
+                  className="w-full py-5 bg-white text-slate-800 border-2 border-slate-200 dark:border-slate-800 dark:bg-slate-900 dark:text-white rounded-2xl font-black uppercase tracking-widest text-[14px] shadow-[0_6px_0_rgba(226,232,240,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(226,232,240,1)] active:translate-y-[6px] active:shadow-none dark:shadow-[0_6px_0_rgba(15,23,42,1)] dark:hover:shadow-[0_4px_0_rgba(15,23,42,1)] transition-all flex items-center justify-center gap-3"
                 >
                   {currentQuestionIndex === questions.length - 1 ? 'End Interview & View Report' : 'Proceed to Next Question'}
                   <ChevronRight className="w-5 h-5" />
