@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Play, CheckCircle, XCircle, Terminal, Mic, Cpu, Award, ChevronRight, CheckCircle2, Clock, CodeSquare, Activity } from 'lucide-react';
+import { Bot, Play, CheckCircle, XCircle, Terminal, Mic, Cpu, Award, ChevronRight, CheckCircle2, Clock, CodeSquare, Activity, Shield } from 'lucide-react';
 import { generateInterviewQuestions, evaluateInterviewAnswer, EvaluationMatrix } from '../../services/geminiService';
 import { trackDailyActivity } from '../../services/courseService';
 
