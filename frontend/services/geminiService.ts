@@ -198,6 +198,33 @@ export const generateQuiz = async (topic: string): Promise<any[]> => {
   }
 };
 
+// Fetch a single quiz question — used for instant-load streaming UX
+export const generateSingleQuestion = async (topic: string, index: number, total: number): Promise<any | null> => {
+  try {
+    const prompt = `Create question ${index + 1} of ${total} for a multiple choice quiz about "${topic}".
+    Return ONLY a single raw JSON object. No markdown, no code blocks, no array wrapper.
+    Format:
+    {
+      "question": "Question text",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correctAnswer": "Exact string of correct option",
+      "explanation": "Why this answer is correct."
+    }`;
+
+    const result = await generateWithRetry(textModel, prompt);
+    const response = await result.response;
+    const text = response.text();
+    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const start = cleanText.indexOf('{');
+    const end = cleanText.lastIndexOf('}');
+    if (start === -1 || end === -1) return null;
+    return JSON.parse(cleanText.substring(start, end + 1));
+  } catch (error) {
+    console.error(`Question ${index + 1} generation error:`, error);
+    return null;
+  }
+};
+
 export const evaluateCareerQuiz = async (answers: string): Promise<CareerSuggestion[]> => {
   try {
     const prompt = `Based on these quiz responses from a student: "${answers}", recommend 3 specific tech career paths. 

@@ -27,6 +27,8 @@ import CommunityView from './CommunityView';
 import PortfolioView from './PortfolioView';
 import AdminManagement from './AdminManagement';
 import { User } from '../../types';
+import { useNotifications } from './useNotifications';
+import NotificationToast from './NotificationToast';
 
 interface DashboardLayoutProps {
   user: User;
@@ -41,6 +43,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [selectedCareer, setSelectedCareer] = useState<string | undefined>(undefined);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { notifications, notify, dismiss } = useNotifications();
 
   useEffect(() => {
      if (activeTab !== 'roadmaps') {
@@ -75,7 +78,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
 
       case 'community': return <CommunityView />;
       case 'profile': return <PortfolioView user={user} />;
-      case 'settings': return <ProfileSettings user={user} onLogout={onLogout} />;
+      case 'settings': return <ProfileSettings user={user} onLogout={onLogout} theme={theme} onToggleTheme={onToggleTheme} />;
       case 'admin': return <AdminManagement />;
       default: return <DashboardHome user={user} onNavigateToRoadmaps={() => setActiveTab('roadmaps')} onNavigateToAssessments={() => setActiveTab('assessments')} onOpenCourse={() => setActiveTab('courses')} />;
     }
@@ -83,6 +86,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
 
   return (
     <div className="flex bg-white dark:bg-slate-950 min-h-screen transition-colors duration-300 relative overflow-hidden">
+      <NotificationToast notifications={notifications} onDismiss={dismiss} />
       
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (

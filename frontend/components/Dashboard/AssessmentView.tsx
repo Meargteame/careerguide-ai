@@ -1,20 +1,20 @@
 
 import React, { useState, useEffect } from 'react';
-import { ClipboardCheck, ArrowRight, Play, Lock, CheckCircle, Clock, Star, Loader2, AlertCircle } from 'lucide-react';
+import { ClipboardCheck, Play, CheckCircle, Clock, Star, Loader2, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { getUserCourses } from '../../services/courseService';
-import { saveQuizResult, getQuizHistory } from '../../services/quizService';
-import QuizRunner from './QuizRunner';
+import { getQuizHistory } from '../../services/quizService';
 
 interface AssessmentViewProps {
   userId: string;
 }
 
 const AssessmentView: React.FC<AssessmentViewProps> = ({ userId }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'available' | 'completed'>('available');
   const [courses, setCourses] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeQuizTopic, setActiveQuizTopic] = useState<string | null>(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -46,8 +46,6 @@ const AssessmentView: React.FC<AssessmentViewProps> = ({ userId }) => {
   const avgScore = history.length > 0 
     ? Math.round(history.reduce((acc, curr) => acc + (curr.score / curr.total_questions), 0) / history.length * 100) 
     : 0;
-
-  const completedConfig = []; // Placeholder for now
 
   return (
     <div className="animate-reveal space-y-12 pb-20">
@@ -96,7 +94,7 @@ const AssessmentView: React.FC<AssessmentViewProps> = ({ userId }) => {
                     </div>
                     
                     <button 
-                      onClick={() => setActiveQuizTopic(q.title)}
+                      onClick={() => navigate(`/quiz/${encodeURIComponent(q.title)}`)}
                       className={`w-full md:w-auto px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-[12px] transition-all bg-violet-600 text-white shadow-[0_6px_0_rgba(109,40,217,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(109,40,217,1)] active:translate-y-[6px] active:shadow-none group/btn flex items-center justify-center gap-2`}
                     >
                       <Play size={18} className="fill-white group-hover/btn:scale-110 transition-transform" /> Fight
@@ -133,17 +131,6 @@ const AssessmentView: React.FC<AssessmentViewProps> = ({ userId }) => {
             )}
           </div>
         </div>
-
-        {activeQuizTopic && (
-          <QuizRunner 
-            topic={activeQuizTopic} 
-            onClose={() => setActiveQuizTopic(null)}
-            onComplete={(score) => {
-              // Save result to Supabase
-              saveQuizResult(userId, activeQuizTopic, score, 5); // Assuming 5 questions
-            }}
-          />
-        )}
 
         <div className="space-y-12">
           {/* Global Stats */}
