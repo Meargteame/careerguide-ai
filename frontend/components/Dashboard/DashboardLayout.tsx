@@ -45,6 +45,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { notifications, notify, dismiss } = useNotifications();
 
+  const [liveXp, setLiveXp] = useState(user.xp);
+  
+  useEffect(() => {
+     setLiveXp(user.xp);
+  }, [user.xp]);
+
+  useEffect(() => {
+     const handleXpEvent = (e: any) => setLiveXp(e.detail);
+     window.addEventListener('xp-updated', handleXpEvent);
+     return () => window.removeEventListener('xp-updated', handleXpEvent);
+  }, []);
+
   useEffect(() => {
      if (activeTab !== 'roadmaps') {
         setSelectedCareer(undefined);
@@ -187,7 +199,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
       <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         
         {/* Mobile Header (Only visible on small screens) */}
-        <header className="lg:hidden h-16 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 sticky top-0 z-30">
+        <header className="lg:hidden h-20 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-slate-500 hover:text-slate-800 dark:hover:text-white">
               <Menu size={24} />
@@ -202,7 +214,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
         </header>
 
         {/* Desktop Header */}
-        <header className="hidden lg:flex h-16 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 items-center justify-between px-8 sticky top-0 z-30">
+        <header className="hidden lg:flex h-20 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800 items-center justify-between px-8 sticky top-0 z-30">
           <h1 className="font-display font-bold text-2xl text-slate-800 dark:text-white">
             {menuItems.find(i => i.id === activeTab)?.label}
           </h1>
@@ -215,7 +227,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
               <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
               <div className="flex items-center gap-2">
                 <Gem size={18} className="text-blue-500 fill-blue-500" />
-                <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{user.xp} XP</span>
+                <span className="font-bold text-sm text-slate-700 dark:text-slate-200">{liveXp} XP</span>
               </div>
             </div>
           </div>
@@ -223,7 +235,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
 
         {/* Dashboard Content Scroller */}
         <div className="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-black/20 p-4 md:p-8">
-          <div className="max-w-6xl mx-auto space-y-8 pb-20">
+          <div className="w-full xl:max-w-none mx-auto space-y-8 pb-20">
             {renderContent()}
           </div>
         </div>

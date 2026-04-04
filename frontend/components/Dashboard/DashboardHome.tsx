@@ -18,7 +18,9 @@ import {
   BookOpen
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import confetti from 'canvas-confetti';
 import { User, Course } from '../../types';
+import { supabase } from '../../services/supabaseClient';
 import { getStudentStats, getRecentActivity, getUserCourses } from '../../services/courseService';
 
 interface DashboardHomeProps {
@@ -33,6 +35,42 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, onNavigateToRoadmap
   const [stats, setStats] = useState({ coursesEnrolled: 0, totalXP: 0, completedLessons: 0 });
   const [recentCourses, setRecentCourses] = useState<Course[]>([]);
   const [activityFeed, setActivityFeed] = useState<any[]>([]);
+  const [claimedReward, setClaimedReward] = useState(false);
+
+  const handleClaimReward = async (e: React.MouseEvent) => {
+     e.stopPropagation();
+     if (claimedReward) return;
+     
+     confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6']
+     });
+     
+     setClaimedReward(true);
+     const newXP = stats.totalXP + 50;
+     setStats(prev => ({...prev, totalXP: newXP}));
+     
+     // Update Supabase to persist!
+     if (user?.id) {
+        const { error } = await supabase
+           .from('profiles')
+           .update({ xp: newXP })
+           .eq('id', user.id);
+           
+        if (error) {
+           console.error("Supabase XP Update failed:", error);
+           // Fallback to Upsert if profile was missing when the page loaded
+           await supabase.from('profiles').upsert({ id: user.id, xp: newXP });
+        }
+        
+        sessionStorage.setItem(`claimed_xp_${user.id}`, 'true');
+     }
+
+     // Dispatch event so top-nav knows instantly
+     window.dispatchEvent(new CustomEvent('xp-updated', { detail: newXP }));
+  };
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -47,6 +85,12 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, onNavigateToRoadmap
          setStats(s);
          setRecentCourses(c || []);
          setActivityFeed(a || []);
+         
+         // Mock checking a 'last_claim_date' or block endless farming 
+         // For a hackathon, we'll store in sessionStorage so it persists across reloads locally today
+         const hasClaimedToday = sessionStorage.getItem(`claimed_xp_${user.id}`);
+         if (hasClaimedToday) setClaimedReward(true);
+
        } catch (err) {
          console.error("Dashboard load error", err);
        } finally {
@@ -166,13 +210,30 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ user, onNavigateToRoadmap
            </div>
         </div>
 
-        <div className="lg:col-span-3 bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 flex flex-col justify-between group hover:-translate-y-2 transition-all duration-300 delay-75 min-h-[240px]">
-           <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-500 shadow-[0_6px_0_rgba(209,250,229,0.5)] group-hover:rotate-6 transition-transform mb-6">
+        <div className="lg:col-span-3 bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 rounded-[2.5rem] p-8 flex flex-col justify-between group hover:-translate-y-2 transition-all duration-300 delay-75 min-h-[240px] relative overflow-hidden">
+           {!claimedReward && (
+             <div className="absolute inset-0 bg-amber-400/10 z-0 animate-pulse pointer-events-none" />
+           )}
+           <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-500 shadow-[0_6px_0_rgba(209,250,229,0.5)] group-hover:rotate-6 transition-transform mb-6 relative z-10">
               <Target size={32} />
            </div>
-           <div>
-              <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Score</p>
-              <h4 className="text-5xl font-black text-slate-800 dark:text-white drop-shadow-md">{stats.totalXP}</h4>
+           <div className="relative z-10 flex flex-col items-start gap-3">
+              <div>
+                 <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Score</p>
+                 <h4 className="text-5xl font-black text-slate-800 dark:text-white drop-shadow-md transition-all duration-500">{stats.totalXP}</h4>
+              </div>
+              
+              <button 
+                onClick={handleClaimReward}
+                disabled={claimedReward}
+                className={`mt-2 w-full py-2.5 rounded-xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 ${claimedReward ? 'bg-slate-100 text-slate-400 border-2 border-slate-200 shadow-none' : 'bg-amber-400 border-2 border-amber-500 text-amber-900 shadow-[0_4px_0_rgba(245,158,11,1)] hover:bg-amber-300 active:translate-y-[4px] active:shadow-none'}`}
+              >
+                 {claimedReward ? (
+                    <>Claimed <CheckCircle size={14} /></>
+                 ) : (
+                    <>+50 Daily Drop <Zap size={14} className="fill-amber-900 animate-pulse" /></>
+                 )}
+              </button>
            </div>
         </div>
 
