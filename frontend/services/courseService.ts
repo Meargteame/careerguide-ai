@@ -63,7 +63,12 @@ export const createCourseFromRoadmap = async (role: string, userId: string): Pro
 export const enrollInCourse = async (courseId: string, userId: string) => {
   const { error } = await supabase
     .from('course_enrollments')
-    .insert([{ course_id: courseId, user_id: userId }]);
+    .upsert([{ 
+      course_id: courseId, 
+      user_id: userId,
+      progress: 0,
+      completed_lessons: []
+    }], { onConflict: 'user_id,course_id', ignoreDuplicates: true });
     
   if (error) throw error;
 };
@@ -103,10 +108,16 @@ export const completeLesson = async (courseId: string, userId: string, lessonId:
           .from('profiles')
           .update({ xp: (profile.xp || 0) + 100 })
           .eq('id', userId);
+          
+        window.dispatchEvent(new CustomEvent('xp-updated', { detail: profile.xp + 100 }));
       }
+      
+      return newProgress;
     }
+    return enrollment.progress;
   } catch (err) {
     console.error("Failed to complete lesson", err);
+    return undefined;
   }
 };
 
@@ -115,6 +126,7 @@ export const getUserCourses = async (userId: string) => {
     .from('course_enrollments')
     .select(`
       progress,
+      completed_lessons,
       course_id,
       courses (*)
     `)
@@ -123,7 +135,8 @@ export const getUserCourses = async (userId: string) => {
   if (error) throw error;
   return data.map((d: any) => ({
     ...d.courses,
-    progress: d.progress || 0
+    progress: d.progress || 0,
+    completed_lessons: d.completed_lessons || []
   }));
 };
 

@@ -21,9 +21,30 @@ const CourseView: React.FC<CourseViewProps> = ({ initialCourseData, onBack, isEn
   const [activeModuleIndex, setActiveModuleIndex] = useState(0);
   const [activeLessonIndex, setActiveLessonIndex] = useState(0);
   const [isEnrolled, setIsEnrolled] = useState(initialEnrolled || !!initialCourseData);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(initialCourseData?.progress || 0);
+  const [completedLessons, setCompletedLessons] = useState<string[]>(initialCourseData?.completed_lessons || []);
   const [isEnrolling, setIsEnrolling] = useState(false);
   const [loadingContent, setLoadingContent] = useState(false);
+
+  // Resume where left off
+  React.useEffect(() => {
+     if (initialCourseData?.completed_lessons && initialCourseData.completed_lessons.length > 0 && initialCourseData.modules) {
+        let found = false;
+        for (let mIdx = 0; mIdx < initialCourseData.modules.length; mIdx++) {
+            const mod = initialCourseData.modules[mIdx];
+            for (let lIdx = 0; lIdx < mod.lessons.length; lIdx++) {
+                const lid = `module-${mIdx}-lesson-${lIdx}`;
+                if (!initialCourseData.completed_lessons.includes(lid)) {
+                    setActiveModuleIndex(mIdx);
+                    setActiveLessonIndex(lIdx);
+                    found = true;
+                    break;
+                }
+            }
+            if (found) break;
+        }
+     }
+  }, [initialCourseData]);
 
   // Effect to load content lazily if pending
   const activeModule = course?.modules[activeModuleIndex];
@@ -82,8 +103,18 @@ const CourseView: React.FC<CourseViewProps> = ({ initialCourseData, onBack, isEn
   const handleCompleteLesson = async () => {
     if (course?.id) {
        const lessonId = `module-${activeModuleIndex}-lesson-${activeLessonIndex}`;
-       await completeLesson(course.id, userId, lessonId);
-       setProgress(prev => Math.min(prev + 10, 100)); // Mock progress locally for quick UI feedback
+       const newProgress = await completeLesson(course.id, userId, lessonId);
+       
+       if (newProgress !== undefined) {
+          setProgress(newProgress);
+       } else {
+          setProgress(prev => Math.min(prev + 10, 100)); // Fallback
+       }
+       
+       setCompletedLessons(prev => {
+          if (!prev.includes(lessonId)) return [...prev, lessonId];
+          return prev;
+       });
     }
 
     // Go to next lesson
@@ -143,6 +174,7 @@ const CourseView: React.FC<CourseViewProps> = ({ initialCourseData, onBack, isEn
                 <div className="space-y-0.5">
                    {module.lessons.map((lesson, lIdx) => {
                       const isActive = activeModuleIndex === mIdx && activeLessonIndex === lIdx;
+                      const isCompleted = completedLessons.includes(`module-${mIdx}-lesson-${lIdx}`);
                       const isLocked = !isEnrolled && mIdx > 0; // Lock modules if not enrolled (demo logic)
 
                       return (
@@ -159,6 +191,8 @@ const CourseView: React.FC<CourseViewProps> = ({ initialCourseData, onBack, isEn
                         >
                            {isActive ? (
                              <PlayCircle size={16} className="text-indigo-500 mt-0.5 shrink-0" />
+                           ) : isCompleted ? (
+                             <CheckCircle size={16} className="text-emerald-500 mt-0.5 shrink-0" />
                            ) : isLocked ? (
                              <Lock size={16} className="text-slate-300 mt-0.5 shrink-0" />
                            ) : (
