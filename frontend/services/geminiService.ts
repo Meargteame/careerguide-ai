@@ -109,53 +109,48 @@ export const getCareerSuggestion = async (interests: string): Promise<CareerSugg
 
 export const generateRoadmap = async (role: string): Promise<DetailedRoadmap | null> => {
   try {
-    const prompt = `Create a deep-dive technical learning roadmap for: "${role}". 
-    Return a hierarchical JSON object with this exact structure for rendering dropdowns:
+    // Smaller, faster prompt — just structure + title/description, fewer topics
+    const prompt = `Create a technical learning roadmap for: "${role}". 
+    Return ONLY raw JSON, no markdown:
     {
-      "title": "Roadmap Title",
-      "description": "Brief overview",
+      "title": "Short Roadmap Title",
+      "description": "One sentence overview",
       "role": "${role}",
       "phases": [
         {
           "id": "phase-1",
-          "title": "Phase Name (e.g., Foundations)",
+          "title": "Phase Name",
           "description": "What this phase covers",
-          "duration": "Duration (e.g., 4 weeks)",
+          "duration": "e.g. 4 weeks",
           "topics": [
             {
-              "title": "Main Topic (e.g., JavaScript Engine)",
-              "concepts": ["Call Stack", "Event Loop", "Memory Heap"],
+              "title": "Topic Name",
+              "concepts": ["concept1", "concept2", "concept3"],
               "resources": [
-                 { "title": "Resource Name", "url": "valid_url_placeholder", "type": "course" }
+                { "title": "Resource Name", "url": "https://example.com", "type": "course" }
               ]
             }
           ]
         }
       ]
     }
-    Requirements:
-    1. Detail 4 distinct phases (Beginner to Advanced).
-    2. Each phase must have 3-5 main topics.
-    3. Each topic must list specific technical concepts (keywords) to master.
-    4. Include real, high-quality free resources (Docs, YouTube, FreeCodeCamp).
-    5. IMPORTANT: Output strictly raw JSON. No markdown code blocks.`;
+    Rules:
+    - Exactly 4 phases.
+    - Each phase has exactly 3 topics (not more).
+    - Each topic has exactly 3 concepts.
+    - Each topic has exactly 1 resource.
+    - Output strictly raw JSON only.`;
 
     const result = await generateWithRetry(model, prompt);
     const response = await result.response;
     const text = response.text();
     
-    // Improved JSON extraction: remove markdown code blocks
     let jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    // If the model output doesn't start with { or [, try to find the structure
     const jsonMatch = jsonString.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-       jsonString = jsonMatch[0];
-    }
+    if (jsonMatch) jsonString = jsonMatch[0];
 
     try {
-      const parsedData = JSON.parse(jsonString);
-      return parsedData as DetailedRoadmap;
+      return JSON.parse(jsonString) as DetailedRoadmap;
     } catch (parseError) {
       console.error("Failed to parse JSON from Gemini response:", text);
       return null;
@@ -164,7 +159,64 @@ export const generateRoadmap = async (role: string): Promise<DetailedRoadmap | n
     console.error("Gemini Roadmap Generation Error:", error);
     return null;
   }
-};
+}
+
+// Stream roadmap phase by phase — call onPhase as each arrives
+export const generateRoadmapStreaming = async (
+  role: string,
+  onMeta: (title: string, description: string) => void,
+  onPhase: (phase: any) => void
+): Promise<void> => {
+  // Step 1: get title + description fast
+  const metaPrompt = `For a "${role}" learning roadmap, return ONLY this raw JSON (no markdown):
+  {"title": "${role} Roadmap", "description": "One sentence describing what this roadmap covers"}`;
+  
+  try {
+    const metaResult = await generateWithRetry(textModel, metaPrompt);
+    const metaText = metaResult.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+    const metaMatch = metaText.match(/\{[\s\S]*?\}/);
+    if (metaMatch) {
+      const meta = JSON.parse(metaMatch[0]);
+      onMeta(meta.title, meta.description);
+    }
+  } catch (e) {
+    onMeta(`${role} Roadmap`, 'AI-generated learning path');
+  }
+
+  // Step 2: generate each phase in parallel (all 4 at once, each is small)
+  const phaseNames = ['Foundations', 'Core Skills', 'Advanced Topics', 'Mastery & Projects'];
+  
+  await Promise.all(phaseNames.map(async (phaseName, idx) => {
+    const phasePrompt = `Create phase ${idx + 1} of 4 ("${phaseName}") for a "${role}" learning roadmap.
+    Return ONLY raw JSON (no markdown):
+    {
+      "id": "phase-${idx + 1}",
+      "title": "${phaseName}",
+      "description": "What this phase covers in one sentence",
+      "duration": "X weeks",
+      "topics": [
+        {
+          "title": "Topic Name",
+          "concepts": ["concept1", "concept2", "concept3"],
+          "resources": [{"title": "Resource", "url": "https://example.com", "type": "course"}]
+        }
+      ]
+    }
+    Rules: exactly 3 topics, 3 concepts each, 1 resource each. Raw JSON only.`;
+
+    try {
+      const result = await generateWithRetry(textModel, phasePrompt);
+      const text = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+      const match = text.match(/\{[\s\S]*\}/);
+      if (match) {
+        const phase = JSON.parse(match[0]);
+        onPhase({ ...phase, _index: idx });
+      }
+    } catch (e) {
+      console.error(`Phase ${idx + 1} generation error:`, e);
+    }
+  }));
+};;
 
 export const generateQuiz = async (topic: string): Promise<any[]> => {
   try {

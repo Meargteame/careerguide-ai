@@ -6,7 +6,7 @@ import {
   Layers, BookOpen, Clock, Youtube, FileText, Globe,
   CheckCircle2, AlertCircle, ArrowRight, Activity, ChevronDown, ChevronUp, Star, Atom, Trash2, Calendar, X
 } from 'lucide-react';
-import { generateRoadmap } from '../../services/geminiService';
+import { generateRoadmap, generateRoadmapStreaming } from '../../services/geminiService';
 import { createCourseFromRoadmap } from '../../services/courseService';
 import { saveRoadmap, getUserRoadmaps, SavedRoadmap, deleteRoadmap } from '../../services/roadmapService';
 import { DetailedRoadmap, RoadmapPhase, RoadmapTopic, Course } from '../../types';
@@ -50,27 +50,51 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
     if (!query.trim()) return;
     setLoading(true);
     setError(null);
+    setResult(null);
+
+    // Extract just the goal for the AI (strip Level/Time metadata)
+    const goalOnly = query.match(/Goal:\s*([^,]+)/i)?.[1]?.trim() || query;
+
     try {
-      const roadmap = await generateRoadmap(query);
-      if (roadmap) {
-        setResult(roadmap);
-        setGeneratedCourse(null);
-        
-        saveRoadmap(roadmap, userId).then(saved => {
-           if (saved) {
-             setHistory(prev => [saved, ...prev]);
-             setCurrentRoadmapId(saved.id);
-           }
-        });
-        
-        setViewMode('roadmap');
-      } else {
-        setError("Failed to generate roadmap. Please try a different query.");
-      }
-    } catch (err) {
-      setError("AI Service unavailable. Check console for API Key status.");
-    } finally {
+      // Show roadmap view immediately with skeleton, fill as phases arrive
+      const shell: DetailedRoadmap = {
+        title: goalOnly,
+        description: 'Generating your personalized roadmap...',
+        role: query,
+        phases: []
+      };
+      setResult(shell);
+      setViewMode('roadmap');
       setLoading(false);
+
+      const phases: any[] = [];
+
+      await generateRoadmapStreaming(
+        goalOnly,
+        (title, description) => {
+          setResult(prev => prev ? { ...prev, title, description } : null);
+        },
+        (phase) => {
+          const idx = phase._index ?? phases.length;
+          phases[idx] = phase;
+          // Sort by index so phases always appear in order
+          const sorted = [...phases].filter(Boolean).sort((a, b) => (a._index ?? 0) - (b._index ?? 0));
+          setResult(prev => prev ? { ...prev, phases: sorted } : null);
+        }
+      );
+
+      // Save after all phases done
+      const finalRoadmap = { ...shell, phases };
+      saveRoadmap(finalRoadmap, userId).then(saved => {
+        if (saved) {
+          setHistory(prev => [saved, ...prev]);
+          setCurrentRoadmapId(saved.id);
+        }
+      });
+
+    } catch (err) {
+      setLoading(false);
+      setError("AI Service unavailable. Check console for API Key status.");
     }
   };
   
@@ -266,6 +290,26 @@ const RoadmapGenerator: React.FC<RoadmapGeneratorProps> = ({ onCourseCreated, us
          <div className="absolute left-[29px] md:left-1/2 top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-800 md:-ml-0.5"></div>
 
          <div className="space-y-16">
+            {/* Skeleton placeholders for phases not yet loaded */}
+            {roadmap.phases.length < 4 && Array.from({ length: 4 - roadmap.phases.length }).map((_, i) => (
+              <div key={`skeleton-${i}`} className={`relative flex flex-col md:flex-row gap-8 items-start ${(roadmap.phases.length + i) % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+                <div className="absolute left-[13px] md:left-1/2 top-8 w-8 h-8 bg-slate-100 dark:bg-slate-800 border-4 border-slate-200 dark:border-slate-700 rounded-full z-10 md:-ml-4 animate-pulse" />
+                <div className="ml-16 md:ml-0 w-full md:w-[calc(50%-40px)]">
+                  <div className="bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-100 dark:border-slate-800 rounded-[2.5rem] p-8 animate-pulse space-y-4">
+                    <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-full w-24" />
+                    <div className="h-7 bg-slate-100 dark:bg-slate-800 rounded-full w-3/4" />
+                    <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-full w-full" />
+                    <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-full w-2/3" />
+                    <div className="flex items-center gap-2 pt-2">
+                      <Loader2 size={14} className="animate-spin text-amber-400" />
+                      <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Generating phase...</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hidden md:block md:w-[calc(50%-40px)]" />
+              </div>
+            ))}
+
             {roadmap.phases.map((phase, idx) => (
               <div key={idx} className={`relative flex flex-col md:flex-row gap-8 items-start ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
                  
