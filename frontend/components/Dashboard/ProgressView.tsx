@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import { Activity, Target, Award, Shield, CheckCircle2, Star, BookOpen } from 'lucide-react';
-import { getStudentStats, getUserCourses } from '../../services/courseService';
+import { Activity, Target, Award, Shield, CheckCircle2, Star, BookOpen, Flame, Coins } from 'lucide-react';
+import { getStudentStats, getUserCourses, trackDailyActivity, checkAndAwardAchievements } from '../../services/courseService';
 import { Course } from '../../types';
 
 interface ProgressViewProps {
@@ -9,18 +9,30 @@ interface ProgressViewProps {
 }
 
 const ProgressView: React.FC<ProgressViewProps> = ({ userId }) => {
-  const [stats, setStats] = useState({ coursesEnrolled: 0, totalXP: 0, completedLessons: 0 });
+  const [stats, setStats] = useState({ 
+    coursesEnrolled: 0, 
+    totalXP: 0, 
+    completedLessons: 0,
+    streak: 0,
+    coins: 0,
+    achievements: [] as any[],
+    bountiesState: {} as any
+  });
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        await trackDailyActivity(userId);
+        await checkAndAwardAchievements(userId);
+        
         const [s, c] = await Promise.all([
            getStudentStats(userId),
            getUserCourses(userId)
         ]);
-        setStats(s);
+        // Merge default state with detailed stats
+        setStats(prev => ({ ...prev, ...s }));
         setCourses(c);
       } catch (e) {
         console.error(e);
@@ -39,11 +51,33 @@ const ProgressView: React.FC<ProgressViewProps> = ({ userId }) => {
   return (
     <div className="animate-reveal max-w-7xl mx-auto pb-20">
       <header className="pb-10 border-b-4 border-slate-100 dark:border-slate-800 mb-12">
-        <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">Player Card</p>
-        <h1 className="text-4xl md:text-5xl font-display font-black text-slate-800 dark:text-white uppercase tracking-widest leading-none drop-shadow-sm mb-4">My Stats</h1>
-        <p className="text-slate-500 dark:text-slate-400 font-bold text-lg max-w-xl">
-          Track your skill tree progression across {courses.length} active quests.
-        </p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">Player Card</p>
+            <h1 className="text-4xl md:text-5xl font-display font-black text-slate-800 dark:text-white uppercase tracking-widest leading-none drop-shadow-sm mb-4">My Stats</h1>
+            <p className="text-slate-500 dark:text-slate-400 font-bold text-lg max-w-xl">
+              Track your skill tree progression across {courses.length} active quests.
+            </p>
+          </div>
+          
+          <div className="flex gap-4">
+            <div className="bg-orange-100 dark:bg-orange-500/20 px-6 py-4 rounded-[2rem] border-2 border-orange-200 dark:border-orange-500/30 flex items-center gap-4 text-orange-500 shadow-sm">
+              <Flame size={28} className="animate-pulse" strokeWidth={3} />
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-0.5">Day Streak</p>
+                <p className="text-2xl font-black">{stats.streak || 0}</p>
+              </div>
+            </div>
+            
+            <div className="bg-amber-100 dark:bg-amber-500/20 px-6 py-4 rounded-[2rem] border-2 border-amber-200 dark:border-amber-500/30 flex items-center gap-4 text-amber-500 shadow-sm">
+              <Coins size={28} strokeWidth={3} />
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-0.5">Meridian Coins</p>
+                <p className="text-2xl font-black">{stats.coins || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </header>
 
       <div className="grid lg:grid-cols-3 gap-12">
@@ -86,20 +120,22 @@ const ProgressView: React.FC<ProgressViewProps> = ({ userId }) => {
               Earned Badges
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {[
-                { title: 'Verified User', org: 'Admin', date: 'Active', status: 'Verified' },
-                { title: 'First User', org: 'Meridian', date: '2024', status: 'Badge' },
-              ].map((c, i) => (
+              {stats.achievements.length > 0 ? stats.achievements.map((c, i) => (
                 <div key={i} className="bg-slate-50 dark:bg-slate-800 p-6 rounded-[2rem] flex items-center gap-6 group hover:bg-amber-400 hover:-translate-y-1 hover:shadow-[0_8px_0_rgba(217,119,6,1)] transition-all border-2 border-transparent hover:border-amber-500 active:translate-y-[2px] active:shadow-none cursor-pointer">
                   <div className="w-16 h-16 bg-white dark:bg-slate-900 rounded-[1.25rem] flex items-center justify-center text-amber-500 border-2 border-slate-200 dark:border-slate-700 shadow-sm shrink-0 group-hover:scale-110 group-hover:rotate-12 transition-transform group-hover:border-amber-300">
-                    <Award size={32} strokeWidth={2.5} />
+                    {c.icon === 'Flame' ? <Flame size={32} strokeWidth={2.5} /> : <Award size={32} strokeWidth={2.5} />}
                   </div>
                   <div>
                     <p className="text-xl font-black text-slate-800 dark:text-white group-hover:text-slate-900 line-clamp-1">{c.title}</p>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 group-hover:text-amber-900/60">{c.org}</p>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="col-span-1 border-2 border-dashed border-slate-200 dark:border-slate-800 p-6 rounded-[2rem] flex flex-col items-center justify-center text-center">
+                   <Shield size={32} className="text-slate-300 mb-2" strokeWidth={2} />
+                   <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No Badges Yet</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

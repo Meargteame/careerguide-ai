@@ -2,6 +2,83 @@ import { supabase } from './supabaseClient';
 import { generateCourseDetails } from './geminiService';
 import { Course } from '../types';
 
+export const checkAndAwardAchievements = async (userId: string) => {
+  try {
+    const stats = await getStudentStats(userId);
+    const { data: profile, error } = await supabase.from('profiles').select('achievements, xp, meridian_coins').eq('id', userId).single();
+    if (error || !profile) return;
+    
+    let currentBadges = profile.achievements || [];
+    let badgeIds = currentBadges.map((b: any) => b.id);
+    let newBadges: any[] = [];
+    let bonusXp = 0;
+    let bonusCoins = 0;
+
+    const award = (id: string, title: string, org: string) => {
+      if (!badgeIds.includes(id)) {
+        newBadges.push({ id, title, org, date: new Date().toISOString() });
+        bonusXp += 50;
+        bonusCoins += 5;
+      }
+    };
+
+    if (stats.completedLessons >= 1) award('first_lesson', 'First Steps', 'Learning');
+    if (stats.completedLessons >= 10) award('10_lessons', 'Knowledge Seeker', 'Learning');
+    if (stats.coursesEnrolled >= 1) award('course_1', 'Scholar', 'Academy');
+    if (stats.coursesEnrolled >= 5) award('course_5', 'Polymath', 'Academy');
+    if (stats.streak >= 3) award('streak_3', '3 Day Streak', 'Meridian');
+    if (stats.streak >= 7) award('streak_7', '7 Day Streak', 'Meridian');
+
+    if (newBadges.length > 0) {
+      await supabase.from('profiles').update({
+        achievements: [...currentBadges, ...newBadges],
+        xp: profile.xp + bonusXp,
+        meridian_coins: profile.meridian_coins + bonusCoins
+      }).eq('id', userId);
+    }
+  } catch (err) {
+    console.error("Error checking achievements:", err);
+  }
+};
+
+export const trackDailyActivity = async (userId: string) => {
+  try {
+    const { data: profile } = await supabase.from('profiles').select('last_active_date, streak').eq('id', userId).single();
+    if (!profile) return 0;
+
+    const todayObj = new Date();
+    const today = todayObj.toISOString().split('T')[0];
+    const lastActive = profile.last_active_date;
+    let newStreak = profile.streak || 0;
+    
+    if (lastActive === today) return newStreak; // Already tracked today
+    
+    if (lastActive) {
+      const yesterday = new Date(todayObj);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      if (lastActive === yesterdayStr) {
+        newStreak += 1;
+      } else if (lastActive < yesterdayStr) {
+        newStreak = 1; // Broken streak
+      }
+    } else {
+      newStreak = 1;
+    }
+
+    await supabase.from('profiles').update({
+      streak: newStreak,
+      last_active_date: today
+    }).eq('id', userId);
+
+    return newStreak;
+  } catch (err) {
+    console.error("Error tracking activity:", err);
+    return 0;
+  }
+};
+
 export const createCourseFromRoadmap = async (role: string, userId: string): Promise<Course | null> => {
   try {
     // 1. Generate Course Content via AI
@@ -96,17 +173,20 @@ export const completeLesson = async (courseId: string, userId: string, lessonId:
         .eq('course_id', courseId)
         .eq('user_id', userId);
 
-      // Also update user XP in profiles
+      // Also update user XP and coins in profiles
       const { data: profile } = await supabase
         .from('profiles')
-        .select('xp')
+        .select('xp, meridian_coins')
         .eq('id', userId)
         .single();
         
       if (profile) {
         await supabase
           .from('profiles')
-          .update({ xp: (profile.xp || 0) + 100 })
+          .update({ 
+            xp: (profile.xp || 0) + 100,
+            meridian_coins: (profile.meridian_coins || 0) + 10 
+          })
           .eq('id', userId);
           
         window.dispatchEvent(new CustomEvent('xp-updated', { detail: profile.xp + 100 }));
@@ -149,7 +229,7 @@ export const getStudentStats = async (userId: string) => {
 
      const { data: profile } = await supabase
        .from('profiles')
-       .select('xp')
+       .select('xp, streak, meridian_coins, achievements, daily_bounties_state, last_active_date')
        .eq('id', userId)
        .single();
 
@@ -163,11 +243,16 @@ export const getStudentStats = async (userId: string) => {
      return {
         coursesEnrolled: count || 0,
         completedLessons: totalCompleted,
-        totalXP: profile?.xp || 0
+        totalXP: profile?.xp || 0,
+        streak: profile?.streak || 0,
+        coins: profile?.meridian_coins || 0,
+        achievements: profile?.achievements || [],
+        bountiesState: profile?.daily_bounties_state || {},
+        lastActiveDate: profile?.last_active_date || null
      };
   } catch (err) {
      console.error("Error fetching stats:", err);
-     return { coursesEnrolled: 0, completedLessons: 0, totalXP: 0 };
+     return { coursesEnrolled: 0, completedLessons: 0, totalXP: 0, streak: 0, coins: 0, achievements: [], bountiesState: {}, lastActiveDate: null };
   }
 };
 
