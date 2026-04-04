@@ -49,8 +49,9 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({ user }) => {
         .select('avatar_url, full_name')
         .eq('id', user.id)
         .single()
-        .then(({ data }) => {
-          if (data?.avatar_url) setAvatarUrl(data.avatar_url);
+        .then(({ data, error }) => {
+          if (error) console.error('Profile fetch error:', error);
+          if (data?.avatar_url) setAvatarUrl(data.avatar_url + '?t=' + Date.now());
           if (data?.full_name) setNameValue(data.full_name);
         });
     }
@@ -80,12 +81,17 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({ user }) => {
         .from('avatars')
         .getPublicUrl(path);
 
-      await supabase
+      // upsert so it works whether the row exists or not
+      const { error: dbError } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', user.id);
+        .upsert({ id: user.id, avatar_url: publicUrl }, { onConflict: 'id' });
 
-      setAvatarUrl(publicUrl + '?t=' + Date.now()); // bust cache
+      if (dbError) {
+        console.error('DB save error:', dbError);
+        throw dbError;
+      }
+
+      setAvatarUrl(publicUrl + '?t=' + Date.now());
       notify('Profile photo updated', 'success');
     } catch (err: any) {
       notify(err.message || 'Upload failed', 'error');
@@ -141,9 +147,8 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({ user }) => {
           </div>
 
           <div className="px-8 md:px-12 pb-12">
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-8 -mt-24 relative z-10 text-center md:text-left">
-
-              {/* Avatar — same visual, now functional */}
+            {/* Avatar row — overlaps banner */}
+            <div className="flex items-end justify-between -mt-20 relative z-10 mb-6">
               <div className="relative group shrink-0">
                 <input
                   ref={fileInputRef}
@@ -152,85 +157,84 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({ user }) => {
                   className="hidden"
                   onChange={handleAvatarChange}
                 />
-                <div className="w-48 h-48 rounded-[2.5rem] bg-indigo-100 border-[8px] border-white dark:border-slate-900 flex items-center justify-center overflow-hidden shadow-[0_8px_0_rgba(203,213,225,1)] dark:shadow-[0_8px_0_rgba(15,23,42,1)] group-hover:-translate-y-2 transition-transform">
+                <div className="w-36 h-36 md:w-44 md:h-44 rounded-[2.5rem] bg-indigo-100 border-[6px] border-white dark:border-slate-900 flex items-center justify-center overflow-hidden shadow-[0_8px_0_rgba(203,213,225,1)] dark:shadow-[0_8px_0_rgba(15,23,42,1)] group-hover:-translate-y-2 transition-transform">
                   {avatarUploading ? (
                     <div className="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-800">
                       <Loader2 size={36} className="animate-spin text-blue-500" />
                     </div>
                   ) : avatarUrl ? (
-                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-500" />
+                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   ) : (
                     <img src={`https://api.dicebear.com/7.x/notionists/svg?seed=${userName}`} alt="Avatar" className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-500" />
                   )}
                 </div>
-                {/* Edit button — same style, now triggers file picker */}
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={avatarUploading}
-                  className="absolute -right-2 bottom-4 w-12 h-12 bg-blue-500 text-white rounded-[1rem] flex items-center justify-center shadow-[0_4px_0_rgba(37,99,235,1)] hover:bg-blue-600 hover:-translate-y-1 hover:shadow-[0_6px_0_rgba(37,99,235,1)] active:translate-y-[4px] active:shadow-none transition-all border-2 border-blue-400 disabled:opacity-60"
+                  className="absolute -right-2 bottom-3 w-10 h-10 bg-blue-500 text-white rounded-[0.875rem] flex items-center justify-center shadow-[0_4px_0_rgba(37,99,235,1)] hover:bg-blue-600 hover:-translate-y-1 hover:shadow-[0_6px_0_rgba(37,99,235,1)] active:translate-y-[4px] active:shadow-none transition-all border-2 border-blue-400 disabled:opacity-60"
                 >
-                  {avatarUploading ? <Loader2 size={18} className="animate-spin" /> : <Camera size={20} strokeWidth={3} />}
+                  {avatarUploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={17} strokeWidth={3} />}
                 </button>
               </div>
 
-              {/* Name + badges */}
-              <div className="flex-1 mb-2">
-                <div className="inline-flex items-center gap-2 text-slate-500 font-black text-[11px] uppercase tracking-[0.2em] mb-3 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-sm">
-                  @{user?.email ? user.email.split('@')[0].toUpperCase() : 'USER'}-ID
-                </div>
-
-                {/* Editable name — same line, same font */}
-                {editingName ? (
-                  <div className="flex items-center gap-3 mb-6">
-                    <input
-                      autoFocus
-                      value={nameValue}
-                      onChange={e => setNameValue(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') handleSaveName(); if (e.key === 'Escape') handleCancelName(); }}
-                      className="text-4xl md:text-6xl font-display font-black text-slate-800 dark:text-white bg-transparent border-b-4 border-blue-500 outline-none w-full leading-tight"
-                    />
-                    <button onClick={handleSaveName} disabled={nameSaving} className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 hover:bg-emerald-600 transition-all disabled:opacity-50">
-                      {nameSaving ? <Loader2 size={16} className="animate-spin" /> : <Check size={18} strokeWidth={3} />}
-                    </button>
-                    <button onClick={handleCancelName} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
-                      <X size={18} strokeWidth={3} />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-3 mb-6 group/name">
-                    <h2 className="text-4xl md:text-6xl font-display font-black text-slate-800 dark:text-white drop-shadow-sm leading-tight">
-                      {userName}
-                    </h2>
-                    <button
-                      onClick={() => setEditingName(true)}
-                      className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center opacity-0 group/name:opacity-100 hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-500 transition-all shrink-0"
-                    >
-                      <Edit2 size={16} strokeWidth={2.5} />
-                    </button>
-                  </div>
-                )}
-
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                  <span className="flex items-center gap-2 text-amber-600 bg-amber-50 border-2 border-amber-200 font-black text-sm px-4 py-2 rounded-xl shadow-sm">
-                    <Zap size={18} strokeWidth={3} className="text-amber-500 fill-amber-500" /> {stats.totalXP} Total XP
-                  </span>
-                  <span className="flex items-center gap-2 text-rose-600 bg-rose-50 border-2 border-rose-200 font-black text-sm px-4 py-2 rounded-xl shadow-sm">
-                    <Flame size={18} strokeWidth={3} className="text-rose-500 fill-rose-500" /> {stats.coursesEnrolled} Quests
-                  </span>
-                </div>
-              </div>
-
-              {/* Action buttons — unchanged */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-2 mt-6 md:mt-0 w-full md:w-auto">
-                <button className="flex-1 md:flex-none flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest text-slate-600 hover:bg-white dark:hover:bg-slate-700 transition-all border-2 border-slate-200 dark:border-slate-700 shadow-sm active:translate-y-[2px] active:shadow-none hover:-translate-y-1">
-                  <Share2 size={18} strokeWidth={3} /> Share Link
+              {/* Action buttons top-right */}
+              <div className="flex gap-3 pb-1">
+                <button className="flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 px-5 py-3 rounded-2xl text-[12px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 transition-all border-2 border-slate-200 dark:border-slate-700 shadow-sm hover:-translate-y-1 active:translate-y-[2px] active:shadow-none">
+                  <Share2 size={16} strokeWidth={3} /> Share
                 </button>
                 <button
                   onClick={() => setEditingName(true)}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-3 px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all bg-emerald-500 text-white shadow-[0_6px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_4px_0_rgba(16,185,129,1)] active:translate-y-[6px] active:shadow-none"
+                  className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all bg-emerald-500 text-white shadow-[0_4px_0_rgba(16,185,129,1)] hover:translate-y-[2px] hover:shadow-[0_2px_0_rgba(16,185,129,1)] active:translate-y-[4px] active:shadow-none"
                 >
-                  <Edit2 size={18} strokeWidth={3} /> Edit Profile
+                  <Edit2 size={16} strokeWidth={3} /> Edit
                 </button>
+              </div>
+            </div>
+
+            {/* Name + badges — cleanly below banner */}
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 text-slate-500 font-black text-[11px] uppercase tracking-[0.2em] bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-sm">
+                @{user?.email ? user.email.split('@')[0].toUpperCase() : 'USER'}-ID
+              </div>
+
+              {/* Editable name */}
+              {editingName ? (
+                <div className="flex items-center gap-3">
+                  <input
+                    autoFocus
+                    value={nameValue}
+                    onChange={e => setNameValue(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') handleSaveName(); if (e.key === 'Escape') handleCancelName(); }}
+                    className="text-4xl md:text-5xl font-display font-black text-slate-800 dark:text-white bg-transparent border-b-4 border-blue-500 outline-none w-full leading-tight"
+                  />
+                  <button onClick={handleSaveName} disabled={nameSaving} className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 hover:bg-emerald-600 transition-all disabled:opacity-50">
+                    {nameSaving ? <Loader2 size={16} className="animate-spin" /> : <Check size={18} strokeWidth={3} />}
+                  </button>
+                  <button onClick={handleCancelName} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                    <X size={18} strokeWidth={3} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 group">
+                  <h2 className="text-4xl md:text-5xl font-display font-black text-slate-800 dark:text-white drop-shadow-sm leading-tight">
+                    {userName}
+                  </h2>
+                  <button
+                    onClick={() => setEditingName(true)}
+                    className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-500 transition-all shrink-0"
+                  >
+                    <Edit2 size={16} strokeWidth={2.5} />
+                  </button>
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-4">
+                <span className="flex items-center gap-2 text-amber-600 bg-amber-50 border-2 border-amber-200 font-black text-sm px-4 py-2 rounded-xl shadow-sm">
+                  <Zap size={18} strokeWidth={3} className="text-amber-500 fill-amber-500" /> {stats.totalXP} Total XP
+                </span>
+                <span className="flex items-center gap-2 text-rose-600 bg-rose-50 border-2 border-rose-200 font-black text-sm px-4 py-2 rounded-xl shadow-sm">
+                  <Flame size={18} strokeWidth={3} className="text-rose-500 fill-rose-500" /> {stats.coursesEnrolled} Quests
+                </span>
               </div>
             </div>
           </div>
