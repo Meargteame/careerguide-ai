@@ -191,51 +191,70 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({ user }) => {
               </div>
             </div>
 
-            {/* Name + badges — cleanly below banner */}
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 text-slate-500 font-black text-[11px] uppercase tracking-[0.2em] bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 shadow-sm">
-                @{user?.email ? user.email.split('@')[0].toUpperCase() : 'USER'}-ID
+            {/* Name row — name left, stats right */}
+            <div className="flex items-start justify-between gap-6 flex-wrap">
+
+              {/* Left: handle + name + edit */}
+              <div className="flex flex-col gap-2 min-w-0">
+                <div className="inline-flex items-center gap-2 text-slate-400 dark:text-slate-500 font-black text-[11px] uppercase tracking-[0.2em] w-fit">
+                  @{user?.email ? user.email.split('@')[0].toLowerCase() : 'user'}
+                </div>
+
+                {editingName ? (
+                  <div className="flex items-center gap-3">
+                    <input
+                      autoFocus
+                      value={nameValue}
+                      onChange={e => setNameValue(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') handleSaveName(); if (e.key === 'Escape') handleCancelName(); }}
+                      className="text-3xl md:text-4xl font-display font-black text-slate-800 dark:text-white bg-transparent border-b-4 border-blue-500 outline-none leading-tight capitalize min-w-0 w-64"
+                    />
+                    <button onClick={handleSaveName} disabled={nameSaving} className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 hover:bg-emerald-600 transition-all disabled:opacity-50">
+                      {nameSaving ? <Loader2 size={14} className="animate-spin" /> : <Check size={16} strokeWidth={3} />}
+                    </button>
+                    <button onClick={handleCancelName} className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+                      <X size={16} strokeWidth={3} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 group">
+                    <h2 className="text-3xl md:text-4xl font-display font-black text-slate-800 dark:text-white leading-tight capitalize">
+                      {userName}
+                    </h2>
+                    <button
+                      onClick={() => setEditingName(true)}
+                      className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-500 transition-all shrink-0"
+                    >
+                      <Edit2 size={14} strokeWidth={2.5} />
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest capitalize">{user?.role || 'Student'}</span>
+                  <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                  <span className="text-[11px] font-bold text-emerald-500 uppercase tracking-widest">Active</span>
+                </div>
               </div>
 
-              {/* Editable name */}
-              {editingName ? (
+              {/* Right: XP + quests stats */}
+              <div className="flex flex-col gap-3 items-end">
                 <div className="flex items-center gap-3">
-                  <input
-                    autoFocus
-                    value={nameValue}
-                    onChange={e => setNameValue(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter') handleSaveName(); if (e.key === 'Escape') handleCancelName(); }}
-                    className="text-4xl md:text-5xl font-display font-black text-slate-800 dark:text-white bg-transparent border-b-4 border-blue-500 outline-none w-full leading-tight"
-                  />
-                  <button onClick={handleSaveName} disabled={nameSaving} className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 hover:bg-emerald-600 transition-all disabled:opacity-50">
-                    {nameSaving ? <Loader2 size={16} className="animate-spin" /> : <Check size={18} strokeWidth={3} />}
-                  </button>
-                  <button onClick={handleCancelName} className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center shrink-0 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
-                    <X size={18} strokeWidth={3} />
-                  </button>
+                  <div className="flex flex-col items-center bg-amber-50 dark:bg-amber-500/10 border-2 border-amber-200 dark:border-amber-500/30 px-5 py-3 rounded-2xl">
+                    <span className="text-xl font-black text-amber-600 dark:text-amber-400 leading-none">{stats.totalXP}</span>
+                    <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest mt-1">Total XP</span>
+                  </div>
+                  <div className="flex flex-col items-center bg-rose-50 dark:bg-rose-500/10 border-2 border-rose-200 dark:border-rose-500/30 px-5 py-3 rounded-2xl">
+                    <span className="text-xl font-black text-rose-600 dark:text-rose-400 leading-none">{stats.coursesEnrolled}</span>
+                    <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest mt-1">Quests</span>
+                  </div>
+                  <div className="flex flex-col items-center bg-blue-50 dark:bg-blue-500/10 border-2 border-blue-200 dark:border-blue-500/30 px-5 py-3 rounded-2xl">
+                    <span className="text-xl font-black text-blue-600 dark:text-blue-400 leading-none">{stats.completedLessons}</span>
+                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-1">Lessons</span>
+                  </div>
                 </div>
-              ) : (
-                <div className="flex items-center gap-3 group">
-                  <h2 className="text-4xl md:text-5xl font-display font-black text-slate-800 dark:text-white drop-shadow-sm leading-tight">
-                    {userName}
-                  </h2>
-                  <button
-                    onClick={() => setEditingName(true)}
-                    className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-500 transition-all shrink-0"
-                  >
-                    <Edit2 size={16} strokeWidth={2.5} />
-                  </button>
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center gap-4">
-                <span className="flex items-center gap-2 text-amber-600 bg-amber-50 border-2 border-amber-200 font-black text-sm px-4 py-2 rounded-xl shadow-sm">
-                  <Zap size={18} strokeWidth={3} className="text-amber-500 fill-amber-500" /> {stats.totalXP} Total XP
-                </span>
-                <span className="flex items-center gap-2 text-rose-600 bg-rose-50 border-2 border-rose-200 font-black text-sm px-4 py-2 rounded-xl shadow-sm">
-                  <Flame size={18} strokeWidth={3} className="text-rose-500 fill-rose-500" /> {stats.coursesEnrolled} Quests
-                </span>
               </div>
+
             </div>
           </div>
         </div>
