@@ -109,7 +109,7 @@ export const getCareerSuggestion = async (interests: string): Promise<CareerSugg
 
 export const generateRoadmap = async (role: string): Promise<DetailedRoadmap | null> => {
   try {
-    const prompt = `Create a deep-dive technical learning roadmap for a "${role}". 
+    const prompt = `Create a deep-dive technical learning roadmap for: "${role}". 
     Return a hierarchical JSON object with this exact structure for rendering dropdowns:
     {
       "title": "Roadmap Title",
