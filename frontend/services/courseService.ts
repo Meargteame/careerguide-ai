@@ -280,3 +280,9 @@ export const getRecentActivity = async (userId: string) => {
       return [];
    }
 };
+
+export const getLeaderboard = async () => { 
+    const { data, error } = await supabase.from('profiles').select('id, full_name, xp, meridian_coins').order('xp', { ascending: false }).limit(20); 
+    if (error) throw error; 
+    return data; 
+};

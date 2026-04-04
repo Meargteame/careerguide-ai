@@ -16,9 +16,14 @@ import {
   Menu,
   Flame,
   Gem,
+  Trophy,
+  Bot,
 } from 'lucide-react';import DashboardHome from './DashboardHome';
 import RoadmapGenerator from './RoadmapGenerator';
 import ProgressView from './ProgressView';
+import LeaderboardView from './LeaderboardView';
+import MarketplaceView from './MarketplaceView';
+import MockInterviewView from './MockInterviewView';
 import MarketInsights from './MarketInsights';
 import ProfileSettings from './ProfileSettings';
 import LibraryView from './LibraryView';
@@ -37,7 +42,7 @@ interface DashboardLayoutProps {
   onToggleTheme: () => void;
 }
 
-export type Tab = 'overview' | 'roadmaps' | 'progress' | 'careers' | 'courses' | 'assessments' | 'community' | 'profile' | 'settings' | 'admin';
+export type Tab = 'overview' | 'roadmaps' | 'progress' | 'leaderboard' | 'marketplace' | 'mock-interview' | 'careers' | 'courses' | 'assessments' | 'community' | 'profile' | 'settings' | 'admin';
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme, onToggleTheme }) => {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
@@ -70,6 +75,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
     { id: 'careers', label: 'Jobs', icon: ShieldCheck },
     { id: 'community', label: 'Chat', icon: Users },
     { id: 'progress', label: 'My Stats', icon: LineChart },
+    { id: 'leaderboard', label: 'Rankings', icon: Trophy },
+    { id: 'marketplace', label: 'Store', icon: Gem },
+    { id: 'mock-interview', label: 'Mock Interviews', icon: Bot },
     { id: 'assessments', label: 'Quizzes', icon: ClipboardCheck },
     { id: 'profile', label: 'Profile', icon: UserCircle },
     { id: 'settings', label: 'Settings', icon: SettingsIcon },
@@ -84,6 +92,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ user, onLogout, theme
       case 'overview': return <DashboardHome user={user} onNavigateToRoadmaps={() => setActiveTab('roadmaps')} onNavigateToAssessments={() => setActiveTab('assessments')} onOpenCourse={() => setActiveTab('courses')} />;
       case 'roadmaps': return <RoadmapGenerator userId={user.id} initialQuery={selectedCareer} />;
       case 'progress': return <ProgressView userId={user.id} />;
+      case 'leaderboard': return <LeaderboardView />;
+      case 'marketplace': return <MarketplaceView userId={user.id} />;
+      case 'mock-interview': return <MockInterviewView userId={user.id} />;
       case 'courses': return <LibraryView userId={user.id} />;
       case 'assessments': return <AssessmentView userId={user.id} />;
       case 'careers': return <MarketInsights onExploreCareer={(c) => { setSelectedCareer(c); setActiveTab('roadmaps'); }} />;
