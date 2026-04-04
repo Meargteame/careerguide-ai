@@ -58,11 +58,24 @@ function App() {
 
   const fetchProfile = async (sbUser: any) => {
     try {
-      const { data: profile } = await supabase
+      let { data: profile } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', sbUser.id)
         .single();
+        
+      if (!profile) {
+        // Create profile if missing
+        const { data: newProfile } = await supabase.from('profiles').insert({
+          id: sbUser.id,
+          email: sbUser.email,
+          full_name: sbUser.user_metadata?.full_name || sbUser.email?.split('@')[0] || 'Student',
+          role: 'student',
+          xp: 0,
+          streak: 0
+        }).select().single();
+        profile = newProfile;
+      }
 
       const mappedUser: User = {
         id: sbUser.id,
