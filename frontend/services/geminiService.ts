@@ -198,6 +198,53 @@ export const generateQuiz = async (topic: string): Promise<any[]> => {
   }
 };
 
+export const getMoreJobs = async (excludeJobs: string[]): Promise<any[]> => {
+  try {
+    const excludeList = excludeJobs.join(", ");
+    const prompt = `You are a career advisor API. Generate exactly 6 modern, digitally-learnable tech or creative careers that are NOT in this list: ${excludeList}.
+    
+    Return a raw JSON array containing exactly 6 objects with this exact structure for rendering on our frontend. 
+    Category MUST be one of: 'Web/App', 'Cyber/Data', 'Systems/Cloud', 'Design/Creative', 'Marketing/Business'.
+    
+    Format:
+    [
+      {
+        "title": "Cloud Operations Engineer",
+        "desc": "Ensure the reliability of cloud infrastructure and pipelines.",
+        "icon": "Cloud", 
+        "color": "text-amber-500",
+        "bg": "bg-amber-50 dark:bg-amber-500/10",
+        "category": "Systems/Cloud",
+        "salary": "$100K - $150K",
+        "growth": "+12%",
+        "companies": ["AWS", "Startups", "Enterprise"]
+      }
+    ]
+    
+    IMPORTANT MUST-FOLLOW RULES:
+    1. Output strictly bare JSON array [ ... ] with no markdown code blocks, no backticks, no markdown formatting.
+    2. The "icon" property MUST be a string specifying one of these Lucide React icon names: "Code2", "Smartphone", "Database", "Cpu", "ShieldAlert", "Cloud", "TrendingUp", "MonitorPlay", "Terminal", "PenTool", "Globe", "Briefcase", "Server", "Layers".
+    3. Ensure variety in categories and colors (use text-blue-500, text-emerald-500, text-rose-500, text-indigo-500, etc. and corresponding bg-50).`;
+
+    const result = await generateWithRetry(model, prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const arrayStart = cleanText.indexOf('[');
+    const arrayEnd = cleanText.lastIndexOf(']');
+    
+    if (arrayStart === -1 || arrayEnd === -1) return [];
+    
+    const jsonStr = cleanText.substring(arrayStart, arrayEnd + 1);
+    const jobs = JSON.parse(jsonStr);
+    return Array.isArray(jobs) ? jobs : [];
+  } catch (error) {
+    console.error("Gemini Job Generation Error:", error);
+    return [];
+  }
+};
+
 // Fetch a single quiz question — used for instant-load streaming UX
 export const generateSingleQuestion = async (topic: string, index: number, total: number): Promise<any | null> => {
   try {

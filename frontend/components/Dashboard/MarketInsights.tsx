@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getMoreJobs } from '../../services/geminiService';
 import { 
   Users, 
   Smartphone, 
@@ -19,8 +20,20 @@ import {
   Clock,
   Star,
   ChevronRight,
-  MonitorPlay
+  MonitorPlay,
+  Bookmark,
+  CheckCircle,
+  Terminal,
+  PenTool,
+  Server,
+  Layers,
+  Loader2
 } from 'lucide-react';
+
+const ICONS: Record<string, any> = {
+  Smartphone, Globe, ShieldAlert, Database, Cpu, Cloud, Code2, 
+  TrendingUp, MonitorPlay, Terminal, PenTool, Server, Layers, Briefcase
+};
 
 interface MarketInsightsProps {
   onExploreCareer?: (career: string) => void;
@@ -29,14 +42,28 @@ interface MarketInsightsProps {
 const MarketInsights: React.FC<MarketInsightsProps> = ({ onExploreCareer }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+  const [bookmarkedJobs, setBookmarkedJobs] = useState<string[]>(() => {
+    const saved = localStorage.getItem('bookmarked_jobs');
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const filters = ['All', 'Web/App', 'Cyber/Data', 'Systems/Cloud'];
+  const toggleBookmark = (title: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newBookmarks = bookmarkedJobs.includes(title) 
+      ? bookmarkedJobs.filter(b => b !== title)
+      : [...bookmarkedJobs, title];
+      
+    setBookmarkedJobs(newBookmarks);
+    localStorage.setItem('bookmarked_jobs', JSON.stringify(newBookmarks));
+  };
 
-  const trendingJobs = [
+  const filters = ['All', 'Bookmarked', 'Web/App', 'Cyber/Data', 'Systems/Cloud', 'Design/Creative', 'Marketing/Business'];
+
+  const [trendingJobs, setTrendingJobs] = useState<any[]>([
     { 
       title: 'Full Stack Engineer', 
       desc: 'Build scalable web applications from front to back.',
-      icon: Code2, 
+      icon: "Code2", 
       color: 'text-indigo-500', 
       bg: 'bg-indigo-50 dark:bg-indigo-500/10',
       category: 'Web/App',
@@ -45,31 +72,42 @@ const MarketInsights: React.FC<MarketInsightsProps> = ({ onExploreCareer }) => {
       companies: ['Google', 'Meta', 'Startups']
     },
     { 
+      title: 'Frontend Developer', 
+      desc: 'Create responsive user interfaces using modern frameworks.',
+      icon: "Smartphone", 
+      color: 'text-sky-500', 
+      bg: 'bg-sky-50 dark:bg-sky-500/10',
+      category: 'Web/App',
+      salary: '$90K - $150K',
+      growth: '+18%',
+      companies: ['Vercel', 'Airbnb', 'Stripe']
+    },
+    { 
+      title: 'Backend Engineer', 
+      desc: 'Design APIs and robust server logic.',
+      icon: "Database", 
+      color: 'text-emerald-500', 
+      bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+      category: 'Web/App',
+      salary: '$110K - $170K',
+      growth: '+12%',
+      companies: ['Uber', 'Netflix', 'Shopify']
+    },
+    { 
       title: 'AI/ML Researcher', 
       desc: 'Develop predictive models and train neural networks.',
-      icon: Cpu, 
+      icon: "Cpu", 
       color: 'text-emerald-500', 
       bg: 'bg-emerald-50 dark:bg-emerald-500/10',
       category: 'Cyber/Data',
-      salary: '$140K - $200K',
+      salary: '$140K - $250K+',
       growth: '+35%',
       companies: ['OpenAI', 'Microsoft', 'Tesla']
     },
     { 
-      title: 'Cloud Security Architect', 
-      desc: 'Design secure infrastructure for cloud deployments.',
-      icon: ShieldAlert, 
-      color: 'text-rose-500', 
-      bg: 'bg-rose-50 dark:bg-rose-500/10',
-      category: 'Systems/Cloud',
-      salary: '$130K - $180K',
-      growth: '+22%',
-      companies: ['AWS', 'CrowdStrike', 'Banks']
-    },
-    { 
       title: 'Data Scientist', 
       desc: 'Analyze complex datasets to drive business decisions.',
-      icon: Database, 
+      icon: "Database", 
       color: 'text-indigo-500', 
       bg: 'bg-indigo-50 dark:bg-indigo-500/10',
       category: 'Cyber/Data',
@@ -78,31 +116,96 @@ const MarketInsights: React.FC<MarketInsightsProps> = ({ onExploreCareer }) => {
       companies: ['Netflix', 'Spotify', 'Uber']
     },
     { 
-      title: 'iOS Developer', 
-      desc: 'Create highly Performant applications for Apple devices.',
-      icon: Smartphone, 
-      color: 'text-sky-500', 
-      bg: 'bg-sky-50 dark:bg-sky-500/10',
-      category: 'Web/App',
-      salary: '$105K - $155K',
-      growth: '+12%',
-      companies: ['Apple', 'Airbnb', 'Lyft']
+      title: 'Cloud Security Architect', 
+      desc: 'Design secure infrastructure for cloud deployments.',
+      icon: "ShieldAlert", 
+      color: 'text-rose-500', 
+      bg: 'bg-rose-50 dark:bg-rose-500/10',
+      category: 'Systems/Cloud',
+      salary: '$130K - $180K',
+      growth: '+22%',
+      companies: ['AWS', 'CrowdStrike', 'Banks']
     },
     { 
       title: 'DevOps Engineer', 
       desc: 'Automate software delivery and manage infrastructure.',
-      icon: Cloud, 
+      icon: "Cloud", 
       color: 'text-amber-500', 
       bg: 'bg-amber-50 dark:bg-amber-500/10',
       category: 'Systems/Cloud',
       salary: '$115K - $165K',
       growth: '+18%',
       companies: ['GitHub', 'Docker', 'Stripe']
+    },
+    { 
+      title: 'UX/UI Designer', 
+      desc: 'Craft intuitive and beautiful digital experiences.',
+      icon: "Code2", 
+      color: 'text-pink-500', 
+      bg: 'bg-pink-50 dark:bg-pink-500/10',
+      category: 'Design/Creative',
+      salary: '$90K - $150K',
+      growth: '+10%',
+      companies: ['Apple', 'Figma', 'Adobe']
+    },
+    { 
+      title: 'Digital Marketer', 
+      desc: 'Drive growth through SEO, PPC, and content strategies.',
+      icon: "TrendingUp", 
+      color: 'text-orange-500', 
+      bg: 'bg-orange-50 dark:bg-orange-500/10',
+      category: 'Marketing/Business',
+      salary: '$70K - $130K',
+      growth: '+14%',
+      companies: ['HubSpot', 'Salesforce', 'Agencies']
+    },
+    { 
+      title: 'Blockchain Developer', 
+      desc: 'Build smart contracts and decentralized applications.',
+      icon: "Code2", 
+      color: 'text-violet-500', 
+      bg: 'bg-violet-50 dark:bg-violet-500/10',
+      category: 'Web/App',
+      salary: '$120K - $180K',
+      growth: '+20%',
+      companies: ['Coinbase', 'Ethereum', 'Web3 Startups']
+    },
+    { 
+      title: '3D Animator / VFX', 
+      desc: 'Create stunning visual effects and animations for games/movies.',
+      icon: "MonitorPlay", 
+      color: 'text-rose-500', 
+      bg: 'bg-rose-50 dark:bg-rose-500/10',
+      category: 'Design/Creative',
+      salary: '$80K - $140K',
+      growth: '+8%',
+      companies: ['Pixar', 'Epic Games', 'Blizzard']
     }
-  ];
+  ]);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const loadMoreJobs = async () => {
+    setLoadingMore(true);
+    try {
+      const existingTitles = trendingJobs.map(j => j.title);
+      const newJobs = await getMoreJobs(existingTitles);
+      
+      if (newJobs && newJobs.length > 0) {
+        setTrendingJobs(prev => [...prev, ...newJobs]);
+      } else {
+        alert("Failed to discover new guilds. The AI might be on cooldown.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error contacting the guild master (AI). Try again soon.");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const filteredJobs = trendingJobs.filter(job => 
-    (activeFilter === 'All' || job.category === activeFilter) &&
+    (activeFilter === 'All' || 
+     (activeFilter === 'Bookmarked' ? bookmarkedJobs.includes(job.title) : job.category === activeFilter)) &&
     job.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -178,16 +281,36 @@ const MarketInsights: React.FC<MarketInsightsProps> = ({ onExploreCareer }) => {
             <p className="text-slate-500 font-bold text-lg max-w-sm mx-auto">Try adjusting your search or filters to see more results.</p>
           </div>
         ) : (
-          filteredJobs.map((job, i) => (
+          filteredJobs.map((job, i) => {
+            const Icon = typeof job.icon === 'string' ? (ICONS[job.icon] || Briefcase) : job.icon;
+            
+            return (
             <div key={i} className="bg-white dark:bg-slate-900 border-x-4 border-t-2 border-b-[8px] border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] hover:-translate-y-2 hover:border-blue-400 hover:shadow-[0_12px_0_rgba(226,232,240,1)] dark:hover:shadow-[0_12px_0_rgba(30,41,59,1)] transition-all group flex flex-col h-full relative overflow-hidden">
               <div className={`absolute -right-10 -top-10 w-32 h-32 ${job.bg} rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500 blur-2xl pointer-events-none`}></div>
               
               <div className="flex items-start justify-between mb-6 relative z-10">
                 <div className={`w-16 h-16 ${job.bg} ${job.color} rounded-[1.5rem] flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-transform shadow-inner`}>
-                  <job.icon size={32} strokeWidth={2.5} />
+                  <Icon size={32} strokeWidth={2.5} />
                 </div>
-                <div className="bg-emerald-100 text-emerald-600 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center gap-1.5 border-2 border-emerald-200 shadow-sm">
-                  <TrendingUp size={14} strokeWidth={3} /> {job.growth}
+                <div className="flex gap-2">
+                  <div className="bg-emerald-100 text-emerald-600 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center gap-1.5 border-2 border-emerald-200 shadow-sm">
+                    <TrendingUp size={14} strokeWidth={3} /> {job.growth}
+                  </div>
+                  <button 
+                    onClick={(e) => toggleBookmark(job.title, e)}
+                    className={`p-2 rounded-xl transition-all border-2 flex items-center justify-center ${
+                      bookmarkedJobs.includes(job.title) 
+                        ? 'bg-indigo-100 text-indigo-600 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/30 shadow-[0_4px_0_rgba(199,210,254,1)] translate-y-[-2px]' 
+                        : 'bg-white text-slate-400 border-slate-200 hover:text-indigo-600 hover:border-indigo-200 dark:bg-slate-800 dark:border-slate-700 dark:hover:border-indigo-500/30'
+                    }`}
+                    title={bookmarkedJobs.includes(job.title) ? "Remove Bookmark" : "Bookmark Job"}
+                  >
+                    {bookmarkedJobs.includes(job.title) ? (
+                      <CheckCircle size={18} strokeWidth={2.5} />
+                    ) : (
+                      <Bookmark size={18} strokeWidth={2.5} />
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -220,11 +343,33 @@ const MarketInsights: React.FC<MarketInsightsProps> = ({ onExploreCareer }) => {
                 onClick={() => onExploreCareer?.(job.title)}
                 className="w-full py-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white rounded-2xl font-black uppercase tracking-widest text-[12px] group-hover:bg-blue-600 group-hover:text-white transition-all flex items-center justify-center gap-2 group/btn border-2 border-transparent group-hover:shadow-[0_6px_0_rgba(37,99,235,1)] group-hover:-translate-y-1 active:translate-y-[2px] active:shadow-none relative z-10"
               >
-                Join Guild <ArrowUpRight size={18} strokeWidth={3} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
+                Create Roadmap <ArrowUpRight size={18} strokeWidth={3} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
               </button>
             </div>
-          ))
+            );
+          })
         )}
+      </div>
+
+      {/* Expand More Jobs API Trigger */}
+      <div className="pt-8 flex justify-center">
+        <button
+          onClick={loadMoreJobs}
+          disabled={loadingMore}
+          className="bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900 font-black uppercase text-sm tracking-widest px-10 py-5 rounded-2xl transition-all shadow-[0_6px_0_rgba(15,23,42,1)] dark:shadow-[0_6px_0_rgba(203,213,225,1)] hover:shadow-[0_4px_0_rgba(15,23,42,1)] dark:hover:shadow-[0_4px_0_rgba(203,213,225,1)] active:shadow-none hover:translate-y-0.5 active:translate-y-[6px] flex items-center gap-3 disabled:opacity-50 disabled:pointer-events-none"
+        >
+          {loadingMore ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Scanning the Matrix...
+            </>
+          ) : (
+            <>
+              <Cpu className="w-5 h-5" />
+              AI: Load More Guilds
+            </>
+          )}
+        </button>
       </div>
 
     </div>
