@@ -464,8 +464,7 @@ export const generateInterviewQuestions = async (role: string, difficulty: 'Begi
   Example: ["question 1", "question 2", "question 3"]`;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
-    const result = await model.generateContent(prompt);
+    const result = await generateWithRetry(model, prompt);
     const jsonStr = extractJsonFromResponse(result);
     return JSON.parse(jsonStr);
   } catch (error) {
@@ -507,8 +506,7 @@ export const evaluateInterviewAnswer = async (
   }`;
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
-    const result = await model.generateContent(prompt);
+    const result = await generateWithRetry(model, prompt);
     const jsonStr = extractJsonFromResponse(result);
     return JSON.parse(jsonStr);
   } catch (error) {
