@@ -3,8 +3,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { CareerSuggestion, DetailedRoadmap, Course } from "../types";
 import { fallbackRoadmap, fallbackCourse } from "./mockData";
 
-// Access environment variables using Vite's syntax
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// Access environment variables using Vite's syntax or fallback to process.env
+const API_KEY = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) || (typeof process !== "undefined" && process.env.VITE_GEMINI_API_KEY);
 
 // Debug: Check if key is loaded (remove in production)
 console.log("Gemini API Key Loaded:", API_KEY ? "Yes (Ends with " + API_KEY.slice(-4) + ")" : "No");
@@ -437,6 +437,21 @@ export const generateLessonContent = async (lessonTitle: string, moduleTitle: st
      console.error("Lesson generation failed", error);
      return "## Error Loading Content\nWe couldn't generate this lesson right now. Please try again later (API Quota might be exceeded).";
   }
+};
+
+const extractJsonFromResponse = (result: any): string => {
+  const text = result.response.text();
+  let cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  const startObj = cleanText.indexOf('{');
+  const startArr = cleanText.indexOf('[');
+  
+  if (startObj !== -1 && (startArr === -1 || startObj < startArr)) {
+    return cleanText.substring(startObj, cleanText.lastIndexOf('}') + 1);
+  }
+  if (startArr !== -1) {
+    return cleanText.substring(startArr, cleanText.lastIndexOf(']') + 1);
+  }
+  return cleanText;
 };
 
 export const generateInterviewQuestions = async (role: string, difficulty: 'Beginner' | 'Intermediate' | 'Advanced'): Promise<string[]> => {
