@@ -48,20 +48,6 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate }) => {
     }
   };
 
-  const handleGoogleSignUp = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo: 'https://careerguide-phi.vercel.app/dashboard'
-        }
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign up with Google');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col justify-center items-center p-6 relative overflow-hidden">
       
@@ -91,20 +77,6 @@ const SignUpPage: React.FC<SignUpPageProps> = ({ onNavigate }) => {
              <span className="w-2 h-2 bg-amber-500 rounded-full" /> {error}
           </div>
         )}
-
-        <button 
-          onClick={handleGoogleSignUp}
-          className="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold py-3.5 rounded-2xl flex items-center justify-center gap-3 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:translate-y-1 mb-6 group"
-        >
-          <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform" /> 
-          Sign up with Google
-        </button>
-
-        <div className="relative flex items-center py-4 mb-6">
-          <div className="flex-grow border-t border-slate-200"></div>
-          <span className="flex-shrink-0 mx-4 text-slate-400 text-sm font-bold uppercase tracking-wider">or sign up with email</span>
-          <div className="flex-grow border-t border-slate-200"></div>
-        </div>
 
         <form onSubmit={handleEmailSignUp} className="space-y-4">
           <div>
