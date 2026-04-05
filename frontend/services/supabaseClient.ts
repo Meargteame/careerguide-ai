@@ -9,7 +9,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Check for placeholder/invalid URL patterns
-if (supabaseUrl?.includes('zksgxdjrjvbpjzjvneux')) {
+if (supabaseUrl?.includes('zksgxdjrjvbpjzjvneux-placeholder-only')) {
   console.error('CRITICAL: You are using a dead Supabase project URL. Please update frontend/.env with your own Supabase credentials.');
 }
 
